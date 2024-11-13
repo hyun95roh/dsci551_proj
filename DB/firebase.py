@@ -48,4 +48,12 @@ class myfireDB:
         self.status_check()
 
 
+def main():
+    test = myfireDB()   
+    test.get(node="FRED") 
+    
+if __name__ == "__main__":
+    main() 
+
+ 
 

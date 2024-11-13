@@ -90,4 +90,12 @@ class mysqlDB:
     def show_columns(self, table_name:str): 
         return self.execute(f"show columns from {table_name};") 
         
-        
+
+def main():
+    test = mysqlDB() 
+    test.disconnect() 
+    test.connect()
+    test.execute("select * from FRED;")
+    
+if __name__ == "__main__":
+    main() 
