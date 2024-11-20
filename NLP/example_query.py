@@ -35,33 +35,34 @@ def is_asking_for_example(user_input) -> bool:
     # user_input = "example query for order by"
 
     user_input = user_input.lower()
-    if "example query" in user_input:
+    if "example query" in user_input: 
         #IS asking for example query
         print("You are asking for example query...")
 
         keywords = what_keyword(user_input)
         print(f"You are asking for example query of {keywords} \n")
 
+        response = "" 
         for keyword in keywords:
             if keyword == "group by":
-                template_groupby()
+                response = template_groupby()
             elif keyword == "having":
-                template_having()
+                response = template_having()
             elif keyword == "where":
-                template_where()
+                response = template_where()
             elif keyword == "order by":
-                template_orderby()
+                response = template_orderby()
             elif keyword == "aggregation" or keyword in {"sum", "min", "max", "count", "avg"}:  
-                template_aggregation(keyword)
+                response = template_aggregation(keyword)
 
             else:
                 pass
 
         #output template of query based on keywords
-        return True
+        return True, response
     else:
         print("You are NOT asking for example query")
-        return False
+        return False, "" 
 
 
 def what_keyword(user_input):
@@ -84,11 +85,12 @@ def what_keyword(user_input):
     return selected_keywords #supports multiple selection of keywords
 
 def template_groupby():
-    database_var = ["CDC","FRED"]
+    database_var = ["CDC","FRED","STOCK"]
     random_database = random.choice(database_var)
 
     if random_database == "CDC":
-        CDC_database_attributes = {
+        '''
+        #CDC_database_attributes = {
         #four attributes
         "subtopic": ["normal_weight", "overweight", 
                      "obese", "grade_1_obese", 
@@ -99,79 +101,95 @@ def template_groupby():
         "time_period": ["1988_to_1994", "1999_to_2002", 
                         "2003_to_2006", "2007_to_2010", 
                         "2011_to_2014", "2015_to_2018"] #6 options
-        }
-        random_select = random.choice(list(CDC_database_attributes.keys()))
-        random_groupby = random.choice(CDC_database_attributes[random_select])
+        }''' 
+        CDC_database_attributes = ['SUBTOPIC','SUBTOPIC_ID','CLASSIFICATION','CLASSIFICATION_ID',
+                                   'GROUP_NAME','GROUP_ID','SUBGROUP','SUBGROUP_ID',
+                                   'ESTIMATE_TYPE','ESTIMATE_TYPE_ID',
+                                   'TIME_PERIOD','TIME_PERIOD_ID','ESTIMATE', 'TIME_PERIOD_ID']  
+        random_select = random.choice(CDC_database_attributes)  
+        random_groupby = random.choice([i for i in CDC_database_attributes if i not in random_select]) 
 
     elif random_database == "FRED":
-        FRED_database_attributes = {
-            "date": ["1980's", "1990's", "2000's", "2010's", "2020's"],
-            "real_median_house": ["50,000s", "60,000s", "70,000s", 
-                                  "80,000s", "90,000s"]
-        }
-        random_select = random.choice(list(FRED_database_attributes.keys()))
-        random_groupby = random.choice(FRED_database_attributes[random_select])
+        FRED_database_attributes = ['date','income']   
+        random_select = random.choice(FRED_database_attributes)  
+        random_groupby = random.choice([i for i in FRED_database_attributes if i not in random_select])
+
+    elif random_database == "STOCK":
+        STOCK_database_attributes = ['DATE','NOV','LLY']    
+        random_select = random.choice(STOCK_database_attributes)  
+        random_groupby = random.choice([i for i in STOCK_database_attributes if i not in random_select])
+
 
     else:
         print("if you see this something went horribly wrong.")
         return
 
     print("EXAMPLE QUERY:\n")
-    print(f"SELECT {random_select} FROM {random_database} \nGROUP BY {random_groupby};\n")
-    pass
+    output = f"SELECT AVG({random_select}) FROM {random_database} GROUP BY {random_groupby};"
+    print(output) 
+    return output 
+    
 
 def template_having():
-    database_var = ["CDC","FRED"]
+    database_var = ["STOCK"] #"FRED","STOCK" 
     random_database = random.choice(database_var)
 
     if random_database == "CDC":
-        CDC_database_attributes = {
-        #four attributes
-        "subtopic": ["normal_weight", "overweight", 
-                     "obese", "grade_1_obese", 
-                     "grade_2_obese", "grade_3_obses"], #6 options
-        "subgroup": ["below_100%_FPL", "100%_to_199%_FPL", 
-                     "200%_to_399%_FPL", "above_400%_FPL"], #4 options
-        "estimate_type": ["age", "crude"], #2 options
-        "time_period": ["1988_to_1994", "1999_to_2002", 
-                        "2003_to_2006", "2007_to_2010", 
-                        "2011_to_2014", "2015_to_2018"] #6 options
-        }
-        random_select = random.choice(list(CDC_database_attributes.keys()))
-        random_groupby = random.choice(CDC_database_attributes[random_select])
-
-        agg_functions = ["COUNT"]
-        random_agg = random.choice(agg_functions)
-        # Get random condition value for HAVING
-        random_number = random.randint(1, 100)
-
-
+        '''
+        CDC_database_attributes = ['SUBTOPIC','SUBTOPIC_ID','CLASSIFICATION','CLASSIFICATION_ID',
+                                   'GROUP_NAME','GROUP_ID','SUBGROUP','SUBGROUP_ID',
+                                   'ESTIMATE_TYPE','ESTIMATE_TYPE_ID',
+                                   'TIME_PERIOD','TIME_PERIOD_ID','ESTIMATE', 'TIME_PERIOD_ID']  
+        random_select = random.choice(CDC_database_attributes)  
+        random_groupby = random.choice([i for i in CDC_database_attributes if i not in random_select]) 
+        '''
+        sample_having = ["SELECT GROUP_NAME, AVG(ESTIMATE) AS avg_estimate FROM CDC GROUP BY GROUP_NAME HAVING AVG(ESTIMATE) < 50;",
+                      "SELECT SUBTOPIC, SUM(ESTIMATE) AS total_estimate FROM CDC GROUP BY SUBTOPIC HAVING SUM(ESTIMATE) > 10;",
+                      "SELECT TIME_PERIOD, COUNT(DISTINCT GROUP_ID) AS distinct_groups FROM CDC GROUP BY TIME_PERIOD HAVING COUNT(DISTINCT GROUP_ID) > 1;"        
+                      ]
 
     elif random_database == "FRED":
-        FRED_database_attributes = {
-            "date": ["1980's", "1990's", "2000's", "2010's", "2020's"],
-            "real_median_house": ["50,000s", "60,000s", "70,000s", 
-                                  "80,000s", "90,000s"]
-        }
-        random_select = random.choice(list(FRED_database_attributes.keys()))
-        random_groupby = random.choice(FRED_database_attributes[random_select])
-
-        agg_functions = ["COUNT"]
-        random_agg = random.choice(agg_functions)
-        # Get random condition value for HAVING
-        random_number = random.randint(1, 100)
-
+        '''
+        FRED_database_attributes = ['date','income']   
+        random_select = random.choice(FRED_database_attributes)  
+        random_groupby = random.choice([i for i in FRED_database_attributes if i not in random_select])
+        '''
+        sample_having = ["SELECT date, COUNT(*) AS record_count FROM FRED GROUP BY date HAVING COUNT(*) > 2;", 
+                         "SELECT income, AVG(income) AS average_income FROM FRED GROUP BY income HAVING AVG(income) > 50000;",
+                         "SELECT date, SUM(income) AS total_income FROM FRED GROUP BY date HAVING SUM(income) > 200000;"
+                        ]
+        
+    elif random_database == "STOCK":
+        '''
+        STOCK_database_attributes = ['DATE','NOV','LLY']    
+        random_select = random.choice(STOCK_database_attributes)  
+        random_groupby = random.choice([i for i in STOCK_database_attributes if i not in random_select])
+        '''
+        sample_having = ["SELECT DATE, COUNT(*) as transaction_count FROM STOCK GROUP BY DATE HAVING COUNT(*) >= 1;",
+                         "SELECT NOV, SUM(price) as total_price FROM STOCK GROUP BY NOV HAVING SUM(price) > 1000;"
+                         "SELECT LLY, AVG(price) as avg_price FROM STOCK GROUP BY LLY HAVING AVG(price) < 50;"
+                        ]
+        
     else:
         print("if you see this something went horribly wrong.")
         return
-
+    
     print("EXAMPLE QUERY:")
+    output = random.choice(sample_having) 
+    print( output )
+    '''
+    agg_functions = ["COUNT"]
+    random_agg = random.choice(agg_functions)
+    # Get random condition value for HAVING
+    random_number = random.randint(1, 100)
+    
     print(f"""
-    SELECT {random_select}, {random_agg}(id) as agg_result FROM {random_database} 
+    SELECT {random_agg}(id) as agg_result FROM {random_database} 
     GROUP BY {random_groupby}
-    HAVING {random_agg}(id) > {random_number};
-    """)
-    pass
+    HAVING {random_agg}(id) < {random_number};
+    """) 
+    ''' 
+    return output 
 
 def template_where():
     database_var = ["CDC","FRED"]
@@ -266,7 +284,7 @@ def template_aggregation(keyword):
                             "2003_to_2006", "2007_to_2010", 
                             "2011_to_2014", "2015_to_2018"] #6 options
             }
-            random_select = random.choice(list(CDC_database_attributes.keys()))
+            random_select = random.choice(list(CDC_database_attributes.keys() ))
 
         elif random_database == "FRED":
             FRED_database_attributes = {
