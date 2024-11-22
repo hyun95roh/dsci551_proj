@@ -68,7 +68,7 @@ def is_asking_for_example(user_input) -> bool:
 def what_keyword(user_input):
     user_input = user_input.lower()
     #just ignore join for now
-    keyword_sets = {"where", "group by", "having", "order by", "aggregatation"}
+    keyword_sets = {"where", "group by", "having", "order by", "aggregation"}
     aggregation_sets = {"sum", "min", "max", "count", "avg"}
 
     selected_keywords = []
@@ -109,15 +109,15 @@ def template_groupby():
         random_select = random.choice(CDC_database_attributes)  
         random_groupby = random.choice([i for i in CDC_database_attributes if i not in random_select]) 
 
-    elif random_database == "FRED":
+    elif random_database == "FRED": 
         FRED_database_attributes = ['date','income']   
         random_select = random.choice(FRED_database_attributes)  
         random_groupby = random.choice([i for i in FRED_database_attributes if i not in random_select])
 
-    elif random_database == "STOCK":
+    elif random_database == "STOCK": 
         STOCK_database_attributes = ['DATE','NOV','LLY']    
         random_select = random.choice(STOCK_database_attributes)  
-        random_groupby = random.choice([i for i in STOCK_database_attributes if i not in random_select])
+        random_groupby = random.choice([i for i in STOCK_database_attributes if i not in random_select]) 
 
 
     else:
@@ -125,7 +125,7 @@ def template_groupby():
         return
 
     print("EXAMPLE QUERY:\n")
-    output = f"SELECT AVG({random_select}) FROM {random_database} GROUP BY {random_groupby};"
+    output = f"SELECT CAST(AVG({random_select}) AS FLOAT) FROM {random_database} GROUP BY {random_groupby};"
     print(output) 
     return output 
     
@@ -165,9 +165,9 @@ def template_having():
         random_select = random.choice(STOCK_database_attributes)  
         random_groupby = random.choice([i for i in STOCK_database_attributes if i not in random_select])
         '''
-        sample_having = ["SELECT DATE, COUNT(*) as transaction_count FROM STOCK GROUP BY DATE HAVING COUNT(*) >= 1;",
-                         "SELECT NOV, SUM(price) as total_price FROM STOCK GROUP BY NOV HAVING SUM(price) > 1000;"
-                         "SELECT LLY, AVG(price) as avg_price FROM STOCK GROUP BY LLY HAVING AVG(price) < 50;"
+        sample_having = ["SELECT LEFT(DATE,4) AS YEAR, COUNT(*) as record_count FROM STOCK GROUP BY YEAR HAVING YEAR='2020';",
+                         "SELECT LEFT(DATE,4) AS YEAR, AVG(NOV) as avg_price FROM STOCK GROUP BY YEAR HAVING YEAR like '201%';",
+                         "SELECT LEFT(DATE,4) AS YEAR, AVG(NOV), AVG(LLY) as avg_price FROM STOCK WHERE LEFT(DATE,4) like '200%' GROUP BY LEFT(DATE,4) ;"
                         ]
         
     else:
@@ -192,178 +192,109 @@ def template_having():
     return output 
 
 def template_where():
-    database_var = ["CDC","FRED"]
+    database_var = ["CDC","FRED","STOCK"]
     random_database = random.choice(database_var)
 
     if random_database == "CDC":
-        CDC_database_attributes = {
-        #four attributes
-        "subtopic": ["normal_weight", "overweight", 
-                     "obese", "grade_1_obese", 
-                     "grade_2_obese", "grade_3_obses"], #6 options
-        "subgroup": ["below_100%_FPL", "100%_to_199%_FPL", 
-                     "200%_to_399%_FPL", "above_400%_FPL"], #4 options
-        "estimate_type": ["age", "crude"], #2 options
-        "time_period": ["1988_to_1994", "1999_to_2002", 
-                        "2003_to_2006", "2007_to_2010", 
-                        "2011_to_2014", "2015_to_2018"] #6 options
-        }
-        random_select = random.choice(list(CDC_database_attributes.keys()))
-        random_where = random.choice(CDC_database_attributes[random_select])
+        sample_where = [
+                "SELECT SUBTOPIC, CLASSIFICATION FROM CDC WHERE SUBTOPIC_ID = 1;",
+                "SELECT GROUP_NAME, ESTIMATE FROM CDC WHERE ESTIMATE_TYPE_ID = 2 AND TIME_PERIOD = '2015-2018';",
+                "SELECT * FROM CDC WHERE SUBGROUP_ID = 9 AND CLASSIFICATION_ID = 3;"
+            ]
 
     elif random_database == "FRED":
-        FRED_database_attributes = {
-            "date": ["1980", "1990", "2000", "2010", "2020"],
-            "real_median_house": ["50,000", "60,000", "70,000", 
-                                  "80,000", "90,000"]
-        }
-        random_select = random.choice(list(FRED_database_attributes.keys()))
-        random_where = random.choice(FRED_database_attributes[random_select])
+        sample_where = [
+                "SELECT date, income FROM FRED WHERE income > 70000;",
+                "SELECT date, income FROM FRED WHERE date = '01/01/2010';",
+                "SELECT * FROM FRED WHERE income BETWEEN 60000 AND 80000;"
+            ]
+
+    elif random_database == "STOCK":
+        sample_where = [
+                "SELECT date, NOV, LLY FROM STOCK WHERE date like '2010-06%';",
+                "SELECT * FROM STOCK WHERE date like '2020-01%';",
+                "SELECT date, NOV, LLY FROM STOCK WHERE LLY BETWEEN 60 AND 120;"
+            ]
 
     else:
         print("if you see this something went horribly wrong.")
         return
 
-    print("EXAMPLE QUERY:\n")
-    print(f"SELECT {random_select} FROM {random_database} \nWHERE {random_select} = {random_where};\n")
-    pass
+    print("EXAMPLE QUERY:")
+    output = random.choice(sample_where)  
+    print( output )
+    return output 
+    
 
 def template_orderby(): 
-    database_var = ["CDC","FRED"]
+    database_var = ["CDC","FRED","STOCK"]
     random_database = random.choice(database_var)
 
-    order_var = ["ASC", "DESC"]
-    random_order = random.choice(order_var)
-
     if random_database == "CDC":
-        CDC_database_attributes = {
-        #four attributes
-        # "subtopic": ["normal_weight", "overweight", 
-        #              "obese", "grade_1_obese", 
-        #              "grade_2_obese", "grade_3_obses"], #6 options
-        "subgroup": ["1_below_100%_FPL", "2_100%_to_199%_FPL", 
-                     "3_200%_to_399%_FPL", "4_above_400%_FPL"], #4 options
-        # "estimate_type": ["age", "crude"], #2 options
-        "time_period": ["1988_to_1994", "1999_to_2002", 
-                        "2003_to_2006", "2007_to_2010", 
-                        "2011_to_2014", "2015_to_2018"] #6 options
-        }
-        random_select = random.choice(list(CDC_database_attributes.keys()))
-        # random_orderby = random.choice(CDC_database_attributes[random_select])
+        sample_where = [
+                "SELECT SUBTOPIC, CLASSIFICATION FROM CDC WHERE SUBTOPIC_ID = 1 ORDER BY SUBTOPIC DESC;",
+                "SELECT GROUP_NAME, ESTIMATE FROM CDC WHERE TIME_PERIOD like '201%' ORDER BY GROUP_NAME;",
+                "SELECT * FROM CDC WHERE SUBGROUP_ID = 9 AND CLASSIFICATION_ID = 3 ORDER BY ESTIMATE DESC;"
+            ]
 
     elif random_database == "FRED":
-        FRED_database_attributes = {
-            "date": ["1980", "1990", "2000", "2010", "2020"],
-            "real_median_house": ["50,000", "60,000", "70,000", 
-                                  "80,000", "90,000"]
-        }
-        random_select = random.choice(list(FRED_database_attributes.keys()))
-        # random_orderby = random.choice(FRED_database_attributes[random_select])
+        sample_where = [
+                "SELECT date, income FROM FRED WHERE income > 70000 ORDER BY income DESC;",
+                "SELECT date, income FROM FRED WHERE date = '01/01/2010' ORDER BY date;",
+                "SELECT * FROM FRED WHERE income BETWEEN 60000 AND 80000 ORDER BY income DESC;"
+            ]
+
+    elif random_database == "STOCK":
+        sample_where = [
+                "SELECT date, NOV, LLY FROM STOCK WHERE date like '2010%' ORDER BY date;",
+                "SELECT * FROM STOCK WHERE date like '2020%' ORDER BY date;",
+                "SELECT date, NOV, LLY FROM STOCK WHERE LLY BETWEEN 60 AND 120 ORDER BY date DESC;"
+            ]
 
     else:
         print("if you see this something went horribly wrong.")
         return
 
-    print("EXAMPLE QUERY:\n")
-    print(f"SELECT {random_select} FROM {random_database} \nORDER BY {random_select} {random_order};\n")
-    pass
+    print("EXAMPLE QUERY:")
+    output = random.choice(sample_where)  
+    print( output )
+    return output     
 
 def template_aggregation(keyword):
-    aggregation_numbers_sets = {"sum", "min", "max", "avg"}
-    aggregation_count = {"count"}
+    aggregation_numbers_sets = {"sum", "min", "max", "avg"} 
+    database_var = ["CDC","FRED","STOCK"] 
+    random_database = random.choice(database_var) 
 
-    if keyword in aggregation_numbers_sets:
-        database_var = ["CDC","FRED"]
-        random_database = random.choice(database_var)
+    if random_database == "CDC":
+        sample_where = [
+                "SELECT SUBTOPIC, COUNT(CLASSIFICATION) FROM CDC GROUP BY SUBTOPIC ORDER BY SUBTOPIC DESC;",
+                "SELECT GROUP_NAME, MAX(ESTIMATE) FROM CDC GROUP BY GROUP_NAME ORDER BY GROUP_NAME;",
+                "SELECT AVG(ESTIMATE) FROM CDC ORDER BY AVG(ESTIMATE) DESC;"
+            ]
 
-        if random_database == "CDC":
-            CDC_database_attributes = {
-            "subgroup": ["1_below_100%_FPL", "2_100%_to_199%_FPL", 
-                        "3_200%_to_399%_FPL", "4_above_400%_FPL"], #4 options
-            "time_period": ["1988_to_1994", "1999_to_2002", 
-                            "2003_to_2006", "2007_to_2010", 
-                            "2011_to_2014", "2015_to_2018"] #6 options
-            }
-            random_select = random.choice(list(CDC_database_attributes.keys() ))
+    elif random_database == "FRED":
+        sample_where = [
+                "SELECT RIGHT(date,4) AS YEAR, CAST(AVG(income) AS FLOAT) AS avg_income  FROM FRED WHERE income > 70000 GROUP BY YEAR ORDER BY AVG(income) DESC;",
+                "SELECT RIGHT(date,4) AS YEAR, MIN(income) FROM FRED WHERE date like '%2010' GROUP BY YEAR ORDER BY YEAR;",
+                "SELECT RIGHT(date,4) AS YEAR, SUM(income) FROM FRED WHERE income BETWEEN 60000 AND 80000 GROUP BY YEAR ORDER BY SUM(income) DESC;"
+            ]
 
-        elif random_database == "FRED":
-            FRED_database_attributes = {
-                "date": ["1980", "1990", "2000", "2010", "2020"],
-                "real_median_house": ["50,000", "60,000", "70,000", 
-                                    "80,000", "90,000"]
-            }
-            random_select = random.choice(list(FRED_database_attributes.keys()))
-        else:
-            print("if you see this something went horribly wrong.")
-            return
-
-        print("EXAMPLE QUERY:\n")
-        print(f"SELECT {keyword}({random_select}) FROM {random_database}; \n")
-
-        pass
-
-    elif keyword in aggregation_count:
-        database_var = ["CDC","FRED"]
-        random_database = random.choice(database_var)
-
-        if random_database == "CDC":
-            CDC_database_attributes = {
-            #four attributes
-            "subtopic": ["normal_weight", "overweight", 
-                         "obese", "grade_1_obese", 
-                         "grade_2_obese", "grade_3_obses"], #6 options
-            "subgroup": ["1_below_100%_FPL", "2_100%_to_199%_FPL", 
-                        "3_200%_to_399%_FPL", "4_above_400%_FPL"], #4 options
-            "estimate_type": ["age", "crude"], #2 options
-            "time_period": ["1988_to_1994", "1999_to_2002", 
-                            "2003_to_2006", "2007_to_2010", 
-                            "2011_to_2014", "2015_to_2018"] #6 options
-            }
-            random_select = random.choice(list(CDC_database_attributes.keys()))
-
-        elif random_database == "FRED":
-            FRED_database_attributes = {
-                "date": ["1980", "1990", "2000", "2010", "2020"],
-                "real_median_house": ["50,000", "60,000", "70,000", 
-                                    "80,000", "90,000"]
-            }
-            random_select = random.choice(list(FRED_database_attributes.keys()))
-
-
-        print("EXAMPLE QUERY:\n")
-        print(f"SELECT {keyword}({random_select}) FROM {random_database}; \n")
+    elif random_database == "STOCK":
+        sample_where = [
+                "SELECT LEFT(date,4) AS YEAR, AVG(NOV), AVG(LLY) FROM STOCK GROUP BY YEAR HAVING YEAR like '2010%' ORDER BY YEAR;",
+                "SELECT LEFT(date,4) AS YEAR, MAX(NOV), MAX(LLY) FROM STOCK GROUP BY YEAR HAVING YEAR like '2020%' ORDER BY YEAR;",
+                "SELECT LEFT(date,4) AS YEAR, MIN(NOV), MIN(LLY) FROM STOCK GROUP BY YEAR HAVING YEAR like '2000%' ORDER BY YEAR DESC;"
+            ]
 
     else:
-    #just the word aggregation
-        database_var = ["CDC","FRED"]
-        random_database = random.choice(database_var)
+        print("if you see this something went horribly wrong.")
+        return
 
-        aggregation_numbers_sets = {"sum", "min", "max", "avg"}
-        random_aggregation = random.choice(aggregation_numbers_sets)
-
-
-
-        if random_database == "CDC":
-            CDC_database_attributes = {
-            "subgroup": ["1_below_100%_FPL", "2_100%_to_199%_FPL", 
-                        "3_200%_to_399%_FPL", "4_above_400%_FPL"], #4 options
-            "time_period": ["1988_to_1994", "1999_to_2002", 
-                            "2003_to_2006", "2007_to_2010", 
-                            "2011_to_2014", "2015_to_2018"] #6 options
-            }
-            random_select = random.choice(list(CDC_database_attributes.keys()))
-
-        elif random_database == "FRED":
-            FRED_database_attributes = {
-                "date": ["1980", "1990", "2000", "2010", "2020"],
-                "real_median_house": ["50,000", "60,000", "70,000", 
-                                    "80,000", "90,000"]
-            }
-            random_select = random.choice(list(FRED_database_attributes.keys()))
-        else:
-            print("if you see this something went horribly wrong.")
-            return
-
-        print("EXAMPLE QUERY:\n")
-        print(f"SELECT {random_aggregation}({random_select}) FROM {random_database}; \n")
+    print("EXAMPLE QUERY:")
+    output = random.choice(sample_where)  
+    print( output )
+    return output
     
+
+
+
