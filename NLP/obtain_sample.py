@@ -13,26 +13,27 @@ def sql_retriever(response):
         return 
 
 def fire_retriever(response): 
+    target_node = [i for i in ['CDC','FRED','STOCK'] if i in response][0]   
+    base_url = 'https://dsci551-2f357-default-rtdb.firebaseio.com/'
+    target_filter = None if response.find('?')==-1 else response[response.find('?')+1:] 
+    print("---- target_node:",target_node)
+    print("---- target_filter:",target_filter)
+
     retriever = myfireDB() 
-    print("We don't support DELETE and PUT to prevent data loss.") 
+    print("---- NOTE) We don't support DELETE and PUT to prevent data loss.") 
     
-    user_input_curl = input("[CURL] Choose one: GET / POST.")
-    user_input_curl = user_input_curl.upper() 
+    user_input_curl = input("Hit 'get', 'show', 'print' to see the retrieved data")
+    user_input_curl = user_input_curl.lower() 
+    command_list = ['get', 'show', 'print']
 
-    while user_input_curl not in ['GET', 'POST','PATCH']: 
-        print("Error. Available command: 'GET' or 'POST' ")
-        user_input_curl = input("[CURL] Choose one: GET / POST.")  
+    while user_input_curl not in command_list:  
+        print("Error. Available command: 'get', 'show','print' ")
+        user_input_curl = input("Hit 'get', 'show', 'print' to see the retrieved data")  
 
-    if user_input_curl == 'GET':
-        user_input1 = input("Choose one node: FRED, STOCK, CDC") 
-        while user_input1 not in ['FRED','STOCK', 'CDC']:
-            print("Error. Available node: FRED, STOCK, CDC")
-            user_input1 = input("Choose one: FRED, STOCK, CDC") 
-            
-        user_input2 = input("[Optional] write your filter statement comming after 'json?'. For example: orderBy='$key'&equalTo='10'")
-        user_input2 = user_input2.strip()  
-        user_input2 = None if len(user_input2)==0 else user_input2 
-        return retriever.get(node=user_input1,filter=user_input2) 
+    if user_input_curl in command_list:            
+        output = retriever.get(node= target_node, filter= target_filter)
+        print(output) 
+        return output 
 
 
     elif user_input_curl in ['POST','PATCH']: 

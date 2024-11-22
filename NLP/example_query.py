@@ -28,6 +28,7 @@ Sample Databases:
 
 import re 
 import random
+base_url = 'https://dsci551-2f357-default-rtdb.firebaseio.com/'
 
 
 def is_asking_sql_example(user_input) -> bool:
@@ -295,7 +296,7 @@ def template_aggregation(keyword):
     print( output )
     return output
     
-def is_asking_fire_example() ->bool: 
+def is_asking_fire_example(user_input) ->bool: 
     user_input = user_input.lower()
     if "example query" in user_input: 
         #IS asking for example query
@@ -306,21 +307,21 @@ def is_asking_fire_example() ->bool:
 
         response = "" 
         for keyword in keywords:
-            if keyword == "get":
+            if keyword == "GET":
                 response = template_get()
             elif keyword == "orderBy":
                 response = template_orderby() 
             elif keyword in ["startAt", "endAt", "equalTo", "between"]:
                 response = template_range() 
             elif keyword == "limit" or keyword in ['limitToFirst','limitToLast']:  
-                response = template_limit(keyword)  
+                response = template_limit()  
             else:
                 pass
 
         #output template of query based on keywords
         return True, response
     else:
-        print("You are NOT asking for example query")
+        print("Available format: example query <GET|orderBy|startAt|endAt|equalTo|limitToFirst|limitToLast>")
         return False, ""
     
 def what_keyword_fire(user_input):
@@ -328,23 +329,26 @@ def what_keyword_fire(user_input):
     selected_keywords = [] 
 
     curl_set = ['GET','POST','PATCH', 'get', 'post', 'patch'] 
-    filter_set = ['startAt','endAt','equalTo', 'startat', 'endat', 'equalto', 'between'] 
+    filter_set = ['orderBy','startAt','endAt','equalTo', 'orderby', 'startat', 'endat', 'equalto'] 
 
     for i in curl_set: 
         if i in user_input :
-            selected_keywords.append(i)
+            selected_keywords.append(i.upper()) # Uppercase-sensitive
 
     for i in filter_set: 
         if i in user_input: 
-            selected_keywords.append(i)
+            q1 = i[-2:] 
+            q2 = q1[0].upper() + q1[1] 
+            j = i.replace(q1, q2)  
+            selected_keywords.append(j)
 
     return selected_keywords 
 
 def template_get(): 
     sample_get = [
-        'curl "https://dsci551-2f357-default-rtdb.firebaseio.com/FRED.json"',
-        'curl "https://dsci551-2f357-default-rtdb.firebaseio.com/STOCK.json"',
-        'curl "https://dsci551-2f357-default-rtdb.firebaseio.com/CDC.json"'
+        f'curl "{base_url}FRED.json"',
+        f'curl "{base_url}STOCK.json"',
+        f'curl "{base_url}CDC.json"'
     ]
 
     print("EXAMPLE QUERY:")
@@ -352,23 +356,13 @@ def template_get():
     print( output )
     return output
 
-def template_orderby():
-
-    print("EXAMPLE QUERY:")
-    output = random.choice(sample_orderby)   
-    print( output )
-    return output
-
-def template_range(): 
-
-    print("EXAMPLE QUERY:")
-    output = random.choice(sample_range)   
-    print( output )
-    return output
-
 def template_limit():
-
+    sample_limit = [
+        f'curl {base_url}/FRED.json?limitToFirst=5',
+        f'curl {base_url}/STOCK.json?limitToLast=1',
+        f'curl {base_url}/CDC.json?limitToFirst=5'
+    ]
     print("EXAMPLE QUERY:")
-    output = random.choice(sample_get)   
+    output = random.choice(sample_limit)   
     print( output )
     return output

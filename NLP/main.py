@@ -26,10 +26,12 @@ def match_sentence():
 def main():
     while True:
         user_input_nlq = input("(Input the number) I want to... 1)see examples, 2)input NLQ")
-        while user_input_nlq not in ['1','2']:
+        while user_input_nlq not in ['1','2','quit']:
             print("Error: Available inputs are: 1 or 2")
             user_input_nlq = input("(Input the number) I want to... 1)see examples, 2)input NLQ")
             continue 
+        if user_input_nlq.lower() == 'quit': 
+            break 
 
         if user_input_nlq == '1':
             user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
@@ -38,7 +40,7 @@ def main():
                 user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
                 continue 
 
-            user_input = input("Enter your query (or 'quit' to exit): ")
+            user_input = input("Available command: example query GET (or 'quit' to exit)")
             if user_input.lower() == 'quit':
                 break
 
