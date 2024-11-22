@@ -26,11 +26,11 @@ Sample Databases:
     - FRED: Federal Reserve economic data
 """
 
-import re
+import re 
 import random
 
 
-def is_asking_for_example(user_input) -> bool:
+def is_asking_sql_example(user_input) -> bool:
     #testing input
     # user_input = "example query for order by"
 
@@ -295,6 +295,80 @@ def template_aggregation(keyword):
     print( output )
     return output
     
+def is_asking_fire_example() ->bool: 
+    user_input = user_input.lower()
+    if "example query" in user_input: 
+        #IS asking for example query
+        print("You are asking for example query...")
 
+        keywords = what_keyword_fire(user_input)
+        print(f"You are asking for example query of {keywords} \n")
 
+        response = "" 
+        for keyword in keywords:
+            if keyword == "get":
+                response = template_get()
+            elif keyword == "orderBy":
+                response = template_orderby() 
+            elif keyword in ["startAt", "endAt", "equalTo", "between"]:
+                response = template_range() 
+            elif keyword == "limit" or keyword in ['limitToFirst','limitToLast']:  
+                response = template_limit(keyword)  
+            else:
+                pass
 
+        #output template of query based on keywords
+        return True, response
+    else:
+        print("You are NOT asking for example query")
+        return False, ""
+    
+def what_keyword_fire(user_input):
+    user_input = user_input  
+    selected_keywords = [] 
+
+    curl_set = ['GET','POST','PATCH', 'get', 'post', 'patch'] 
+    filter_set = ['startAt','endAt','equalTo', 'startat', 'endat', 'equalto', 'between'] 
+
+    for i in curl_set: 
+        if i in user_input :
+            selected_keywords.append(i)
+
+    for i in filter_set: 
+        if i in user_input: 
+            selected_keywords.append(i)
+
+    return selected_keywords 
+
+def template_get(): 
+    sample_get = [
+        'curl "https://dsci551-2f357-default-rtdb.firebaseio.com/FRED.json"',
+        'curl "https://dsci551-2f357-default-rtdb.firebaseio.com/STOCK.json"',
+        'curl "https://dsci551-2f357-default-rtdb.firebaseio.com/CDC.json"'
+    ]
+
+    print("EXAMPLE QUERY:")
+    output = random.choice(sample_get)   
+    print( output )
+    return output
+
+def template_orderby():
+
+    print("EXAMPLE QUERY:")
+    output = random.choice(sample_orderby)   
+    print( output )
+    return output
+
+def template_range(): 
+
+    print("EXAMPLE QUERY:")
+    output = random.choice(sample_range)   
+    print( output )
+    return output
+
+def template_limit():
+
+    print("EXAMPLE QUERY:")
+    output = random.choice(sample_get)   
+    print( output )
+    return output

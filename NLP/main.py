@@ -1,6 +1,6 @@
 from attribute_matcher import match_attributes
 from attribute_sets import attribute_sets
-from example_query import is_asking_for_example
+from example_query import is_asking_sql_example, is_asking_fire_example 
 from mysql import mysqlDB  
 from firebase import myfireDB 
 from obtain_sample import sql_retriever, fire_retriever
@@ -23,35 +23,69 @@ def match_sentence():
 
 #NEXT: turn "matched attribtues" into query.
 
-
 def main():
     while True:
-        user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
-        if user_input_DB not in ['1','2'] :
-            print("Error: Available inputs are: 1 or 2") 
+        user_input_nlq = input("(Input the number) I want to... 1)see examples, 2)input NLQ")
+        while user_input_nlq not in ['1','2']:
+            print("Error: Available inputs are: 1 or 2")
+            user_input_nlq = input("(Input the number) I want to... 1)see examples, 2)input NLQ")
             continue 
 
-        user_input = input("Enter your query (or 'quit' to exit): ")
-        if user_input.lower() == 'quit':
-            break
+        if user_input_nlq == '1':
+            user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
+            while user_input_DB not in ['1','2'] :
+                print("Error: Available inputs are: 1 or 2") 
+                user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
+                continue 
 
-        print(f"Your Input: {user_input}")
-        # is_asking_for_example(user_input) #outputs bool. user should start with "example query" to access
-        boolean, response = is_asking_for_example(user_input) 
-         
-        if boolean and user_input_DB=='1':
-            #print("Response:", response)
-            sql_retriever(response)   
-            continue 
-        elif boolean and user_input_DB=='2':
-            fire_retriever(response)
-            continue 
-        else:
-            print("run rest of code")
-            continue
-        # match_sentence() 
-        
+            user_input = input("Enter your query (or 'quit' to exit): ")
+            if user_input.lower() == 'quit':
+                break
 
+            if user_input_DB=='1':  #when user pick DB=SQL
+                print(f"Your Input: {user_input}")
+                # is_asking_for_example(user_input) #outputs bool. user should start with "example query" to access
+                boolean, response = is_asking_sql_example(user_input)  
+                
+                if boolean :
+                    #print("Response:", response)
+                    sql_retriever(response)   
+                    continue 
+                else:
+                    print("run rest of code")
+                    continue
+                # match_sentence()
+
+            else: #when user pick DB=Firebase 
+                boolean, response = is_asking_fire_example(user_input)
+                if boolean :
+                    fire_retriever(response) 
+                    continue  
+                else: 
+                    print("run rest of code") 
+                    continue 
+
+        if user_input_nlq == '2': # This handles NLQ to DB query.
+            user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
+            while user_input_DB not in ['1','2'] :
+                print("Error: Available inputs are: 1 or 2") 
+                user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
+                continue 
+
+            user_input = input("Enter your query (or 'quit' to exit): ")
+            if user_input.lower() == 'quit':
+                break
+
+            if user_input_DB=='1':  #when user pick DB=SQL
+                print(f"Your Input: {user_input}")
+                # is_asking_for_example(user_input) #outputs bool. user should start with "example query" to access
+                # boolean, response = *** Place NLQ-parser here *** 
+
+            else :  # when user pick DB=Firebase
+                print(f"Your Input: {user_input}")
+                # is_asking_for_example(user_input) #outputs bool. user should start with "example query" to access
+                # boolean, response = *** Place NLQ-parser here *** 
+            pass
 
 if __name__ == "__main__":
     main()

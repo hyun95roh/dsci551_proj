@@ -47,6 +47,12 @@ class myfireDB:
         self.response = requests.post(self.request_url, json=data)
         self.status_check()
 
+    def patch(self, node, data:dict): 
+        self.request_url = f"{self.testbase_url}/{node}.json"
+        self.response = requests.patch(self.request_url, json=data)
+        self.status_check()
+
+
 
 def main():
     print("hi")
