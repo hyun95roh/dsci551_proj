@@ -1,0 +1,12 @@
+Bug report:
+
+1. Do not use “total” in user query
+2. If we want to have the ability to SELECT multiple attributes, we need to differentiate between attributes of different keywords. We don’t have a way to do that yet.
+3. adjacent_toekn functions have trouble taking in two word key words like “grouped by”. I just let it use “grouped” instead as a workaround. 
+4. New function “next_token”, instead of nearest, it looks for nearest but nexted.
+5. Added “Calculate” to check_sleect pattern
+6. A few examples require did not use the correct starting keywords. Lets only allow the query with correct key words
+7. If the user use convoluted grammar, which things around, then it won’t be able to comprehend. “Ie: Group the TIME_PERIOD by SUBGROUP in CDC”
+8. New function, convert_to_query_syntax
+9. For the stock table. We might need to change the column name “date” since it its a reserved keyword(?
+10. New function, convert_to_order_syntax
