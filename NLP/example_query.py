@@ -45,13 +45,13 @@ def is_asking_sql_example(user_input) -> bool:
 
         response = "" 
         for keyword in keywords:
-            if keyword == "group by":
+            if keyword == "groupby":
                 response = template_groupby()
             elif keyword == "having":
                 response = template_having()
             elif keyword == "where":
                 response = template_where()
-            elif keyword == "order by":
+            elif keyword == "orderby":
                 response = template_orderby()
             elif keyword == "aggregation" or keyword in {"sum", "min", "max", "count", "avg"}:  
                 response = template_aggregation(keyword)
@@ -67,9 +67,10 @@ def is_asking_sql_example(user_input) -> bool:
 
 
 def what_keyword(user_input):
-    user_input = user_input.lower()
+    # Make input case-incensitive and space-incensitive.
+    user_input = user_input.lower().replace(" ","") 
     #just ignore join for now
-    keyword_sets = {"where", "group by", "having", "order by", "aggregation"}
+    keyword_sets = {"where", "groupby", "having", "orderby", "aggregation"}
     aggregation_sets = {"sum", "min", "max", "count", "avg"}
 
     selected_keywords = []

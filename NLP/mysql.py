@@ -60,6 +60,11 @@ class mysqlDB:
         self.execute(drop_table_schema)
         return self.execute("show tables;")    
 
+    def alter_table_schema(self, alter_table_schema): 
+        self.execute(alter_table_schema) #alter table {table_name} modify {alter_table_schema}
+        table_name = alter_table_schema.split(" ")[2]
+        return self.execute(f"describe {table_name} ;")
+
     def insert_into(self,table_name): 
         # line-by-line approach 
         for row in self.imported_data.itertuples(index=False):

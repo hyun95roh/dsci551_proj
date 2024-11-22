@@ -3,7 +3,7 @@ from attribute_sets import attribute_sets
 from example_query import is_asking_sql_example, is_asking_fire_example 
 from mysql import mysqlDB  
 from firebase import myfireDB 
-from obtain_sample import sql_retriever, fire_retriever
+from retreive_data import sql_retriever, fire_retriever
 
 def match_sentence():
     sentence = "normal weight. unemployment. What is the average of Real Median Household Income when the population percentage below 100 percentage FPL exceeds 30"
@@ -25,26 +25,29 @@ def match_sentence():
 
 def main():
     while True:
-        user_input_nlq = input("(Input the number) I want to... 1)see examples, 2)input NLQ")
-        while user_input_nlq not in ['1','2','quit']:
+        print("Hello! How can I help you?") 
+        user_input_nlq = input("Please Input your natural language query, or choose a number from example natural language query(NLQ)---> Example NLQ: 1)I want to see query examples, 2)Tell me about database, 3)I'll input NLQ")
+        user_input_nlq = user_input_nlq.lower() 
+        while user_input_nlq not in ['1','2','3','quit','examples','example','nlq','natural language','explore','database','db']:
             print("Error: Available inputs are: 1 or 2")
-            user_input_nlq = input("(Input the number) I want to... 1)see examples, 2)input NLQ")
+            user_input_nlq = input("Your query should keywords,i.e., {example(s)|nlq|explore database|db}. --> Query format e.g.: I want to see query examples, I'll input NLQ")
             continue 
-        if user_input_nlq.lower() == 'quit': 
+        if user_input_nlq == 'quit': 
             break 
-
-        if user_input_nlq == '1':
-            user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
-            while user_input_DB not in ['1','2'] :
-                print("Error: Available inputs are: 1 or 2") 
-                user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
+        
+        if user_input_nlq in ['1','examples','example']:
+            user_input_DB = input("Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase")
+            user_input_DB = user_input_DB.lower() 
+            while user_input_DB not in ['1','2','mysql','sql','firebase','fire'] :
+                print("Sorry. Please refer to available commands: { 1 | 2 | mysql | sql | firebase | fire } ") 
+                user_input_DB = input("Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase")
                 continue 
 
-            user_input = input("Available command: example query GET (or 'quit' to exit)")
             if user_input.lower() == 'quit':
                 break
 
-            if user_input_DB=='1':  #when user pick DB=SQL
+            if user_input_DB in ['1','sql','mysql']:  #when user pick DB=SQL
+                user_input = input("Sorry. Please refer to available commands: example query {where|groupby|orderby|having|aggregation} (or 'quit' to exit)")
                 print(f"Your Input: {user_input}")
                 # is_asking_for_example(user_input) #outputs bool. user should start with "example query" to access
                 boolean, response = is_asking_sql_example(user_input)  
@@ -59,6 +62,7 @@ def main():
                 # match_sentence()
 
             else: #when user pick DB=Firebase 
+                user_input = input("Sorry. Please refer to available commands: example query GET (or 'quit' to exit)")
                 boolean, response = is_asking_fire_example(user_input)
                 if boolean :
                     fire_retriever(response) 
@@ -67,18 +71,19 @@ def main():
                     print("run rest of code") 
                     continue 
 
-        if user_input_nlq == '2': # This handles NLQ to DB query.
-            user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
-            while user_input_DB not in ['1','2'] :
+        if user_input_nlq in ['3','nlq']: # This handles NLQ to DB query.
+            user_input_DB = input("Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase")
+            user_input_DB = user_input_DB.lower() 
+            while user_input_DB not in ['1','2','sql','mysql','firebase','fire'] :
                 print("Error: Available inputs are: 1 or 2") 
-                user_input_DB = input("Which DB do you want? Input the number: 1. MySQL / 2.Firebase")
+                user_input_DB = input("Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase")
                 continue 
 
             user_input = input("Enter your query (or 'quit' to exit): ")
             if user_input.lower() == 'quit':
                 break
 
-            if user_input_DB=='1':  #when user pick DB=SQL
+            if user_input_DB==['1','sql','mysql']:  #when user pick DB=SQL
                 print(f"Your Input: {user_input}")
                 # is_asking_for_example(user_input) #outputs bool. user should start with "example query" to access
                 # boolean, response = *** Place NLQ-parser here *** 
