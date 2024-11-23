@@ -1,19 +1,74 @@
 import streamlit as st
 import pandas as pd
+import time
 
 # Set page configuration
 st.set_page_config(page_title="551 Project", page_icon="📚")
 
-# Page 1: Introduction
-def page1():
-    st.title("Introduction")
-    # Overview section
-    st.write("### Project Overview")
-    st.write(
-        "An Interactive Data Exploration Tool for Obesity Rates, Income, "
-        "and pharmaceutical stock sales."
-    )
 
+#Page 1
+def page1():
+    # Add global styling for the entire website
+    st.markdown("""
+        <style>
+        /* Set background color for the entire page */
+        body {
+            background-color: #f7f8fa; /* Light, neutral background */
+            color: #2c3e50; /* Text color for better readability */
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Style the main title */
+        .main-title {
+            font-family: 'Arial', sans-serif;
+            font-size: 50px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Style the subtitle */
+        .sub-title {
+            font-family: 'Arial', sans-serif;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        /* Style expanders */
+        .st-expander {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #ffffff; /* White background for expanders */
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Style buttons */
+        .stButton > button {
+            background-color: #6c5ce7; /* Button background */
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            transition: 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* Hover effect for buttons */
+        .stButton > button:hover {
+            background-color: #00cec9; /* Hover color */
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Fancy title and subtitle
+    st.markdown("<h1 class='main-title'>Introduction</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='sub-title'>Interactive Data Exploration Tool</p>", unsafe_allow_html=True)
+
+    # Project overview section
+    st.write("An Interactive Data Exploration Tool for Obesity Rates, Income, and Pharmaceutical Stock Sales.")
+    st.write("Explore insights and correlations between health, economics, and industry trends using this tool.")
 
     # File paths
     bmi_data_path = "/Users/clarason/Downloads/CleanCDC_2.csv"
@@ -30,51 +85,77 @@ def page1():
         return
 
     # Display datasets with expanders
-    with st.expander("Data 1 : Centers for BMI Data from Disease Control and Prevention Data (CDC)"):
+    st.write("### Datasets Display")
+
+    with st.expander("📊 Data 1: BMI Data from CDC"):
         st.dataframe(bmi_data.head(10))
 
-    with st.expander("Data 2 : Median Household Income Data from Federal Reserve Economic Data (FRED)"):
+    with st.expander("💰 Data 2: Median Household Income Data"):
         st.dataframe(income_data.head(10))
 
-    with st.expander("Data 3 : Eli Lilly and Novo Nordisk Stock Data"):
+    with st.expander("📈 Data 3: Pharmaceutical Stock Data"):
         st.dataframe(stock_data.head(10))
 
+    # Team members section
     st.write("### Team Members")
-    st.write("(1)HaYoung Son  ", " ", "  (2)Ching (Jing) Chuang  ", " ", "  (3)Hyuntae Roh")
+    st.markdown("""
+    <p style="font-size: 18px;">
+        1) HaYoung (Clara) Son &emsp;&emsp; 2) Ching (Jing) Chuang &emsp;&emsp; 3) Hyuntae Roh
+    </p>
+    """, unsafe_allow_html=True)
 
-# Page 2: ChatDB - Chatbot Interface
+
 def page2():
     st.title("ChatDB: Chatbot Interface")
     st.write("Welcome to ChatDB! This is your chatbot interface.")
 
-    # Query Guidelines Section
-    with st.expander("## Query Guidelines -- Click for Assistance!"):
-        st.write(
-            "This is the guideline to make an input query. "
-            "Please do the following:"
-        )
+    # Initialize chat history with a guideline message
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
-    # Chatbot conversation history in session state
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
+    # Guidelines in an expandable box
+    with st.expander("📜 Guidelines"):
+        st.markdown("""
+        Welcome to the ChatDB chatbot interface! Here are some guidelines to help you get started:
 
-    # Input box for user query
-    user_input = st.text_input("Enter your query:")
+        - **Be specific and concise** when asking questions.
+        - **Include relevant context** for more accurate responses.
+        - **Avoid overly vague or broad queries.**
 
-    # Handle user input when button is clicked
-    if st.button("Chat!"):
-        if user_input:
-            # Reverse the order of words in the user's input
-            reversed_words = " ".join(user_input.split()[::-1])
-            response = f"{reversed_words}"
-            
-            # Append the response to the chat history
-            st.session_state.chat_history.append(response)
-    
-    # Display the chat history
-    st.write("### Chat History:")
-    for response in st.session_state.chat_history:
-        st.write(response)
+        Feel free to start exploring your data with queries!
+        """)
+
+    # Display chat history from session state
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Chat input box
+    if user_input := st.chat_input("Type your message here..."):
+        # Append user message to chat history
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
+        # Simulate assistant response with streaming effect
+        with st.chat_message("assistant"):
+            response_placeholder = st.empty()
+            full_response = f"You said: {user_input}"  # Replace with actual processing logic
+            response = ""
+            for word in full_response.split():
+                response += word + " "
+                response_placeholder.markdown(response)
+                time.sleep(0.1)
+
+        # Append assistant response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+
+
+
+
+
+
 
 # Page 3: Data Analysis
 def page3():
@@ -85,16 +166,16 @@ def page3():
 def main():
     st.sidebar.title("Navigation")
     page = st.sidebar.radio(
-        "Go to", 
+        "Go to",
         ["🏠 Introduction", "💬 ChatDB", "📊 Analytics"]
     )
 
     if page == "🏠 Introduction":
-        page1()  # Updated Introduction page
+        page1()  # Your existing Introduction page function
     elif page == "💬 ChatDB":
-        page2()
+        page2()  # Updated ChatDB page
     elif page == "📊 Analytics":
-        page3()
+        page3()  # Your existing Analytics page function
 
 # Run the app
 if __name__ == "__main__":
