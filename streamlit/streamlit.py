@@ -160,7 +160,34 @@ def page2():
 # Page 3: Data Analysis
 def page3():
     st.title("Data Analysis")
-    st.write("Welcome to Page 3! This is the content for Page 3.")
+    st.write("Welcome to the Data Analysis page! Here, you can explore insights and visualize the relationships between BMI, income, and pharmaceutical stock data.")
+
+    # Obesity vs Pharmaceutical Stocks Correlational Analysis 
+    st.subheader("Obesity vs Pharmaceutical Stocks")
+    st.write("Below is a series of analyses comparing different obesity levels with pharmaceutical stock data.")
+
+    # Display images in a 2x2 grid
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image("/Users/clarason/Downloads/normal_vs_stocks.png", caption="Normal vs. Stock Data")
+        st.image("/Users/clarason/Downloads/obesity_2_vs_stocks.png", caption="Obesity Level 2 vs. Stock Data")
+    with col2:
+        st.image("/Users/clarason/Downloads/obesity_1_vs_stocks.png", caption="Obesity Level 1 vs. Stock Data")
+        st.image("/Users/clarason/Downloads/obesity_3_vs_stocks.png", caption="Obesity Level 3 vs. Stock Data")
+
+    st.markdown("""
+    **Interpretation:**
+    Fixxx
+    """)
+
+    # Additional Correlation Analysis Image
+    st.subheader("Obesity vs Median Income")
+    st.image("/Users/clarason/Downloads/fred_all_correlation_final.png")
+    st.markdown("""
+    **Interpretation:**
+    Fixxx
+    """)
+
 
 # Main Function: Navigation
 def main():
