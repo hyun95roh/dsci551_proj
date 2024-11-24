@@ -154,6 +154,7 @@ def page2():
     # Input box for user interaction
     if user_input := st.chat_input("Type your message here..."):
         # Append user's message to chat history
+        user_input = user_input.strip() 
         st.session_state.messages.append({"role": "user", "content": user_input})
         with st.chat_message("user"):
             st.markdown(user_input)
