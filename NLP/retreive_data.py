@@ -1,16 +1,39 @@
 from mysql import mysqlDB  
 from firebase import myfireDB
-import json 
+import json
+import pandas as pd  
 
-def sql_retriever(response):
+def sql_retriever(response,print_out=None):
     retriever = mysqlDB() 
     retriever.disconnect()
     retriever.connect()
-    user_input = input("Do you want to see the retreival result? (y, n)")
-    if user_input.lower() in ['y','yes']:
-        return retriever.execute(response)
-    else: 
-        return 
+    #user_input = input("Do you want to see the retreival result? (y, n)")
+    if print_out in ['y', 'yes', True]:
+        # Execute the main query
+        result = retriever.execute(response)  # Output: list of tuples
+
+        # Dynamically handle column names based on the query
+        try:
+            # Extract result column names from the executed query
+            column_names_query = f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{response.split('FROM')[1].split()[0].strip()}'"
+            table_columns = [col[0] for col in retriever.execute(column_names_query)]
+
+            # Infer column names from the query structure if possible
+            if "AVG(" in response or "SUM(" in response or "COUNT(" in response or "MAX(" in response or "MIN(" in response:
+                # For aggregation queries, manually define result column names
+                column_names = [col.strip() for col in response.split("SELECT")[1].split("FROM")[0].split(",")]
+            else:
+                column_names = table_columns  # Default to all table columns
+        except IndexError:
+            raise ValueError("Unable to determine column names for the query.")
+
+        # Format the result as a table-like string
+        rows = [f"{'  '.join(map(str, row))}" for row in result]
+        formatted_result = f"{'  '.join(column_names)}\n" + "\n".join(rows)
+        return formatted_result  # Return the formatted string
+
+    else:
+        return "You did not choose to print the actual data. Try again."
 
 def fire_retriever(response): 
     target_node = [i for i in ['CDC','FRED','STOCK'] if i in response][0]   

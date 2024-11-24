@@ -38,10 +38,10 @@ def is_asking_sql_example(user_input) -> bool:
     user_input = user_input.lower()
     if "example query" in user_input: 
         #IS asking for example query
-        print("You are asking for example query...")
+        #print("You are asking for example query...")
 
         keywords = what_keyword(user_input)
-        print(f"You are asking for example query of {keywords} \n")
+        #print(f"You are asking for example query of {keywords} \n")
 
         response = "" 
         for keyword in keywords:
@@ -62,10 +62,9 @@ def is_asking_sql_example(user_input) -> bool:
         #output template of query based on keywords
         return True, response
     else:
-        print("You are NOT asking for example query")
-        return False, "" 
-
-
+        #print("You are NOT asking for example query")
+        return False, ""
+ 
 def what_keyword(user_input):
     # Make input case-incensitive and space-incensitive.
     user_input = user_input.lower().replace(" ","") 
@@ -127,7 +126,7 @@ def template_groupby():
         return
 
     print("EXAMPLE QUERY:\n")
-    output = f"SELECT CAST(AVG({random_select}) AS FLOAT) FROM {random_database} GROUP BY {random_groupby};"
+    output = f"SELECT AVG({random_select}) FROM {random_database} GROUP BY {random_groupby} LIMIT 10;"
     print(output) 
     return output 
     
@@ -199,23 +198,23 @@ def template_where():
 
     if random_database == "CDC":
         sample_where = [
-                "SELECT SUBTOPIC, CLASSIFICATION FROM CDC WHERE SUBTOPIC_ID = 1;",
-                "SELECT GROUP_NAME, ESTIMATE FROM CDC WHERE ESTIMATE_TYPE_ID = 2 AND TIME_PERIOD = '2015-2018';",
-                "SELECT * FROM CDC WHERE SUBGROUP_ID = 9 AND CLASSIFICATION_ID = 3;"
+                "SELECT SUBTOPIC, CLASSIFICATION FROM CDC WHERE SUBTOPIC_ID = 1 LIMIT 10;",
+                "SELECT GROUP_NAME, ESTIMATE FROM CDC WHERE ESTIMATE_TYPE_ID = 2 AND TIME_PERIOD = '2015-2018' LIMIT 10;",
+                "SELECT * FROM CDC WHERE SUBGROUP_ID = 9 AND CLASSIFICATION_ID = 3 LIMIT 10;"
             ]
 
     elif random_database == "FRED":
         sample_where = [
-                "SELECT date, income FROM FRED WHERE income > 70000;",
-                "SELECT date, income FROM FRED WHERE date = '01/01/2010';",
-                "SELECT * FROM FRED WHERE income BETWEEN 60000 AND 80000;"
+                "SELECT date, income FROM FRED WHERE income > 70000 LIMIT 10;",
+                "SELECT date, income FROM FRED WHERE date = '01/01/2010' LIMIT 10;",
+                "SELECT * FROM FRED WHERE income BETWEEN 60000 AND 80000 LIMIT 10;"
             ]
 
     elif random_database == "STOCK":
         sample_where = [
-                "SELECT date, NOV, LLY FROM STOCK WHERE date like '2010-06%';",
-                "SELECT * FROM STOCK WHERE date like '2020-01%';",
-                "SELECT date, NOV, LLY FROM STOCK WHERE LLY BETWEEN 60 AND 120;"
+                "SELECT date, NOV, LLY FROM STOCK WHERE date like '2010-06%' LIMIT 10;",
+                "SELECT * FROM STOCK WHERE date like '2020-01%' LIMIT 10;",
+                "SELECT date, NOV, LLY FROM STOCK WHERE LLY BETWEEN 60 AND 120 LIMIT 10;"
             ]
 
     else:
@@ -234,23 +233,23 @@ def template_orderby():
 
     if random_database == "CDC":
         sample_where = [
-                "SELECT SUBTOPIC, CLASSIFICATION FROM CDC WHERE SUBTOPIC_ID = 1 ORDER BY SUBTOPIC DESC;",
-                "SELECT GROUP_NAME, ESTIMATE FROM CDC WHERE TIME_PERIOD like '201%' ORDER BY GROUP_NAME;",
-                "SELECT * FROM CDC WHERE SUBGROUP_ID = 9 AND CLASSIFICATION_ID = 3 ORDER BY ESTIMATE DESC;"
+                "SELECT SUBTOPIC, CLASSIFICATION FROM CDC WHERE SUBTOPIC_ID = 1 ORDER BY SUBTOPIC DESC LIMIT 10;",
+                "SELECT GROUP_NAME, ESTIMATE FROM CDC WHERE TIME_PERIOD like '201%' ORDER BY GROUP_NAME LIMIT 10;",
+                "SELECT * FROM CDC WHERE SUBGROUP_ID = 9 AND CLASSIFICATION_ID = 3 ORDER BY ESTIMATE DESC LIMIT 10;"
             ]
 
     elif random_database == "FRED":
         sample_where = [
-                "SELECT date, income FROM FRED WHERE income > 70000 ORDER BY income DESC;",
-                "SELECT date, income FROM FRED WHERE date = '01/01/2010' ORDER BY date;",
-                "SELECT * FROM FRED WHERE income BETWEEN 60000 AND 80000 ORDER BY income DESC;"
+                "SELECT date, income FROM FRED WHERE income > 70000 ORDER BY income DESC LIMIT 10;",
+                "SELECT date, income FROM FRED WHERE date = '01/01/2010' ORDER BY date LIMIT 10;",
+                "SELECT * FROM FRED WHERE income BETWEEN 60000 AND 80000 ORDER BY income DESC LIMIT 10;"
             ]
 
     elif random_database == "STOCK":
         sample_where = [
-                "SELECT date, NOV, LLY FROM STOCK WHERE date like '2010%' ORDER BY date;",
-                "SELECT * FROM STOCK WHERE date like '2020%' ORDER BY date;",
-                "SELECT date, NOV, LLY FROM STOCK WHERE LLY BETWEEN 60 AND 120 ORDER BY date DESC;"
+                "SELECT date, NOV, LLY FROM STOCK WHERE date like '2010%' ORDER BY date LIMIT 10;",
+                "SELECT * FROM STOCK WHERE date like '2020%' ORDER BY date LIMIT 10;",
+                "SELECT date, NOV, LLY FROM STOCK WHERE LLY BETWEEN 60 AND 120 ORDER BY date DESC LIMIT 10;"
             ]
 
     else:

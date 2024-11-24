@@ -5,23 +5,67 @@ from mysql import mysqlDB
 from firebase import myfireDB 
 from retreive_data import sql_retriever, fire_retriever
 
-def match_sentence():
-    sentence = "normal weight. unemployment. What is the average of Real Median Household Income when the population percentage below 100 percentage FPL exceeds 30"
 
-    matched_sets = match_attributes(sentence, attribute_sets)
+def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print_out=None):
+    """
+    Handles the user input based on their intent.
 
-    if matched_sets:
-        print("Matched attributes:")
-        for set_name, attributes in matched_sets.items():
-            print(f"  {set_name}: {attributes}")
-    else:
-        print("No matches found in any set.")
+    Args:
+        user_input_nlq (str): User's intent (examples, database, or NLQ).
+        user_input_DB (str, optional): Database choice (MySQL or Firebase). Defaults to None.
+        user_query (str, optional): The actual query entered by the user. Defaults to None.
 
-# # If you want to know which specific sets had matches
-# matched_set_names = list(matched_sets.keys())
-# print(f"\nSets with matches: {matched_set_names}")
+    Returns:
+        str: The response to be displayed or processed further.
+    """
+    user_input_nlq = user_first_nlq.lower()
 
-#NEXT: turn "matched attribtues" into query.
+#    if user_input_nlq in ['1', 'db', 'database']:
+#        if not user_input_DB:
+#            return "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"
+#        if not user_query:
+#            return "Enter your query (or type 'quit' to exit):"
+#        else:
+#            return "Invalid database choice. Please choose either MySQL or Firebase."
+
+
+    if user_input_nlq in ['2', 'examples', 'example']:
+        if not user_input_DB:
+            return "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"
+        
+        if user_input_DB in ['1', 'sql', 'mysql']:
+            boolean, response = is_asking_sql_example(user_query)
+            if boolean: 
+                if print_out in ['y','yes',True]: # Print out the actual data
+                    return response, sql_retriever(response, print_out)
+                
+                return response # Skip print out the actual data  
+            else:
+                return "Your input does not match an example SQL query. Please refer to available commands: example query {where|groupby|orderby|having|aggregation}."
+        
+        elif user_input_DB in ['2', 'firebase']:
+            boolean, response = is_asking_fire_example(user_query)
+            if boolean:
+                if print_out in ['y','yes',True]: 
+                    return response, fire_retriever(response, print_out)
+                return response 
+            else:
+                return "Your input does not match an example Firebase query. Please refer to available commands: example query GET."
+        
+        else:
+            return "Invalid database choice. Please choose either MySQL or Firebase."
+
+
+#    if user_input_nlq in ['3', 'nlq']:
+#        if not user_input_DB:
+#            return "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"
+#        if not user_query:
+#            return "Enter your query (or type 'quit' to exit):"
+#        else:
+#            return "Invalid database choice. Please choose either MySQL or Firebase."
+
+    return "Invalid input. Please choose one of the available options: 1 (examples), 2 (database), or 3 (NLQ)."
+
 
 def main():
     while True:
@@ -35,7 +79,7 @@ def main():
         if user_input_nlq == 'quit': 
             break 
         
-        if user_input_nlq in ['1','examples','example']:
+        if user_input_nlq in ['2','examples','example']:
             user_input_DB = input("Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase")
             user_input_DB = user_input_DB.lower() 
             while user_input_DB not in ['1','2','mysql','sql','firebase','fire'] :
@@ -96,3 +140,25 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#####################################################################################
+#### DEPRECATED Functions ###########################################################
+'''
+def match_sentence():
+    sentence = "normal weight. unemployment. What is the average of Real Median Household Income when the population percentage below 100 percentage FPL exceeds 30"
+
+    matched_sets = match_attributes(sentence, attribute_sets)
+
+    if matched_sets:
+        print("Matched attributes:")
+        for set_name, attributes in matched_sets.items():
+            print(f"  {set_name}: {attributes}")
+    else:
+        print("No matches found in any set.")
+
+# # If you want to know which specific sets had matches
+# matched_set_names = list(matched_sets.keys())
+# print(f"\nSets with matches: {matched_set_names}")
+
+#NEXT: turn "matched attribtues" into query.
+'''

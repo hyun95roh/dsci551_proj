@@ -1,0 +1,318 @@
+import streamlit as st
+import pandas as pd
+import time
+
+# Set page configuration
+st.set_page_config(page_title="551 Project", page_icon="📚")
+
+
+#Page 1
+def page1():
+    # Add global styling for the entire website
+    st.markdown("""
+        <style>
+        /* Set background color for the entire page */
+        body {
+            background-color: #f7f8fa; /* Light, neutral background */
+            color: #2c3e50; /* Text color for better readability */
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Style the main title */
+        .main-title {
+            font-family: 'Arial', sans-serif;
+            font-size: 50px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Style the subtitle */
+        .sub-title {
+            font-family: 'Arial', sans-serif;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        /* Style expanders */
+        .st-expander {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #ffffff; /* White background for expanders */
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Style buttons */
+        .stButton > button {
+            background-color: #6c5ce7; /* Button background */
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            transition: 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* Hover effect for buttons */
+        .stButton > button:hover {
+            background-color: #00cec9; /* Hover color */
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Fancy title and subtitle
+    st.markdown("<h1 class='main-title'>Introduction</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='sub-title'>Interactive Data Exploration Tool</p>", unsafe_allow_html=True)
+
+    # Project overview section
+    st.write("An Interactive Data Exploration Tool for Obesity Rates, Income, and Pharmaceutical Stock Sales.")
+    st.write("Explore insights and correlations between health, economics, and industry trends using this tool.")
+
+    # File paths
+    bmi_data_path = "/Users/clarason/Downloads/CleanCDC_2.csv"
+    income_data_path = "/Users/clarason/Downloads/FRED.csv"
+    stock_data_path = "/Users/clarason/Downloads/stock.csv"
+
+    # Load datasets
+    try:
+        bmi_data = pd.read_csv(bmi_data_path)
+        income_data = pd.read_csv(income_data_path)
+        stock_data = pd.read_csv(stock_data_path)
+    except FileNotFoundError as e:
+        st.error(f"Error: {e}")
+        return
+
+    # Display datasets with expanders
+    st.write("### Datasets Display")
+
+    with st.expander("📊 Data 1: BMI Data from CDC"):
+        st.dataframe(bmi_data.head(10))
+
+    with st.expander("💰 Data 2: Median Household Income Data"):
+        st.dataframe(income_data.head(10))
+
+    with st.expander("📈 Data 3: Pharmaceutical Stock Data"):
+        st.dataframe(stock_data.head(10))
+
+    # Team members section
+    st.write("### Team Members")
+    st.markdown("""
+    <p style="font-size: 18px;">
+        1) HaYoung (Clara) Son &emsp;&emsp; 2) Ching (Jing) Chuang &emsp;&emsp; 3) Hyuntae Roh
+    </p>
+    """, unsafe_allow_html=True)
+
+
+from main import handle_user_input
+
+#----------------------------------------------------------------------------------------------
+# Streamlit interaction
+def page2():
+    st.title("ChatDB: Chatbot Interface")
+    st.write("Welcome to ChatDB! This is your Database query assistant. You can choose DB among MySQL and Firebase.")
+
+    # Initialize chat history and context in session state
+    if "messages" not in st.session_state:
+        st.session_state.messages = []  # Stores chat history
+    if "stage" not in st.session_state:
+        st.session_state.stage = "initial"  # Tracks the current stage of the interaction
+    if "user_input_nlq" not in st.session_state:
+        st.session_state.user_input_nlq = None  # Stores user's choice of NLQ option
+    if "user_input_db" not in st.session_state:
+        st.session_state.user_input_db = None  # Stores user's database choice
+    if "user_input_printout" not in st.session_state: 
+        st.session_state.user_input_printout =None #Stores user's retrieval print-out choice
+    if 'response' not in st.session_state:
+        st.session_state.response = None
+    if 'user_input' not in st.session_state:
+        st.session_state.user_input = None 
+    if 'retrieved_data' not in st.session_state: 
+        st.session_state.retrieved_data =None 
+
+
+    # Welcoming message from the assistant
+    if st.session_state.stage == 'initial' and len(st.session_state.messages)==0:
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": "Hello! I'm ChatDB_39, your assistant. How can I help you today? Please choose an option: 1 (Database) 2 (Examples), 3 (NLQ)."
+        })
+
+    # Display chat history
+    for message in st.session_state.messages:
+        if message["role"] == "user":
+            with st.chat_message("user"):
+                st.markdown(message["content"])
+        elif message["role"] == "assistant":
+            with st.chat_message("assistant"):
+                st.markdown(message["content"])
+
+    # Input box for user interaction
+    if user_input := st.chat_input("Type your message here..."):
+        # Append user's message to chat history
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
+        # Process user's input based on the current stage
+        #-- 1. initial stage
+        if st.session_state.stage == "initial": 
+            if user_input not in ['1','database','db','2','examples','example','3','nlq']:
+                st.session_state.response = "I didn't understand. Please choose an option: 1 (DB Exploration) 2 (See Example query), 3 (NLQ)."
+            else: 
+                st.session_state.user_input_nlq = user_input
+                st.session_state.stage = "choose_db"
+                st.session_state.response = "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"                
+        
+        #-- 2.a1. DB selection stage
+        elif st.session_state.stage == "choose_db":
+            if user_input.lower() in ["1", "sql", "mysql"]:
+                st.session_state.user_input_db = "mysql"
+                if st.session_state.user_input_nlq in ['1','database','db','db exploration','explore db']:
+                    st.session_state.stage = 'explore_db'
+                    st.session_state.response = "You've selected MySQL. First, let me show you the overview of table. Tell me which table or attribute information do you want to see?"
+
+                if st.session_state.user_input_nlq in ['2','examples','example','see example','see example query']:
+                    st.session_state.stage = "choose_retrieve_option"
+                    st.session_state.response = "Would you like to retrieve the actual data from DB and print them out?"
+
+            elif user_input.lower() in ["2", "firebase", "fire"]:
+                st.session_state.user_input_db = "firebase"
+                st.session_state.stage = "choose_retrieve_option"
+                st.session_state.response = "Would you like to retrieve the actual data from DB and print them out?"
+            else:
+                st.session_state.response = "Invalid database choice. Please choose either MySQL (1) or Firebase (2)."
+
+        #-- 2.a2. DB exploration stage 
+        elif st.session_state.stage == 'explore_db': 
+            user_input_nlq = st.session_state.user_input_nlq
+            user_input_db = st.session_state.user_input_db
+            user_input_printout = st.session_state.user_input_printout 
+            st.session_state.response = handle_user_input(user_input_nlq, user_input_DB=user_input_db, user_query=user_input, print_out=user_input_printout)
+            st.session_state.stage = "initial"  # Reset the stage after processing the query            
+
+        #-- 2.b1. Retrieval option setting stage
+        elif st.session_state.stage == 'choose_retrieve_option':
+            if user_input.lower() in ['y','yes','ok']:
+                st.session_state.user_input_printout = True
+                st.session_state.stage = "enter_query"
+                if st.session_state.user_input_db == 'mysql':
+                    st.session_state.response = "Please refer to available commands: example query {where|groupby|orderby|having|aggregation}."
+                else: 
+                    st.session_state.response = "Please refer to available command: example query {GET}." 
+            else: 
+                st.session_state.user_input_printout = False 
+                st.session_state.stage = 'enter_query'
+                st.session_state.response = "Please refer to available commands: example query {where|groupby|orderby|having|aggregation}."
+
+        #-- 2.b2. Query request stage
+        elif st.session_state.stage == 'enter_query' or 'example query' in user_input:
+            user_input_nlq = st.session_state.user_input_nlq
+            user_input_db = st.session_state.user_input_db
+            user_input_printout = st.session_state.user_input_printout 
+            st.session_state.response, st.session_state.retrieved_data = handle_user_input(
+                    user_input_nlq, 
+                    user_input_DB=user_input_db, 
+                    user_query=user_input, 
+                    print_out=user_input_printout
+                )
+            st.session_state.stage = 'stand_by'
+
+
+        # Print out assisntant's response: 
+        ## Streaming effect for assistant's response
+        assistant_response(st.session_state.response)
+        if st.session_state.retrieved_data is not None:
+            assistant_response(st.session_state.retrieved_data)
+
+        #-- 3. Stand-by stage
+        if st.session_state.stage == "stand_by": 
+            st.session_state.response = "Anything else I can help you with? If you want to go back to the first stage to change your current stage, enter 'initial'. If you want to switch the database, hit 'switch'."
+            assistant_response(st.session_state.response)
+            st.session_state.stage == 'closing'
+
+        #if user_input in ['initial','initialize','switch']: 
+        #-- 4. Closing stage
+        elif st.session_state.stage == "closing":
+            st.session_state.response = "Please wait a moment... all set! Hit Enter to proceed."
+            if st.session_state.user_input == 'initial':
+                st.session_state.stage = "initial"
+            elif st.session_state.user_input == 'switch':
+                st.session_state.stage = "choose_db"
+            else: 
+                st.session_state.stage = 'enter_query'
+            assistant_response(st.session_state.response)
+            
+
+
+
+def assistant_response(response):
+        assistant_message_container = st.chat_message("assistant")
+        with assistant_message_container:
+            full_response, is_code = stream_effect(response) #-- Gives streaming effect on the assitant's response 
+
+        # Append the full assistant's response to chat history
+        append_response_to_chat(full_response, is_code) 
+
+def stream_effect(response): 
+    if response is None:
+        response_placeholder = st.empty()
+        response_placeholder.markdown("No response to display.")
+        return "", False
+
+    response_placeholder = st.empty()
+    full_response = response  # Full response text
+    displayed_text = ""
+    is_code = False 
+
+    # Check if the response is tabular (contains multiple lines)
+    if "\n" in full_response:  # Likely a tabular result
+        lines = full_response.split("\n")
+        for line in lines:
+            displayed_text += line + "\n"
+            response_placeholder.markdown(f"```\n{displayed_text}\n```")  # Render as a code block
+            time.sleep(0.1)
+        is_code = True 
+    else:
+        # Stream the response word by word for normal text
+        for word in full_response.split():
+            displayed_text += word + " "
+            response_placeholder.markdown(displayed_text)
+            time.sleep(0.1)
+
+    return full_response, is_code 
+
+def append_response_to_chat(full_response, is_code=False):
+    """
+    Append response to chat history with optional code formatting.
+    """
+    if is_code:
+        full_response = f"```\n{full_response}\n```"  # Wrap response in triple backticks
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+
+#------------------------------------------------------------------------------------------
+# Page 3: Data Analysis
+def page3():
+    st.title("Data Analysis")
+    st.write("Welcome to Page 3! This is the content for Page 3.")
+
+# Main Function: Navigation
+def main():
+    st.sidebar.title("Navigation")
+    page = st.sidebar.radio(
+        "Go to",
+        ["🏠 Introduction", "💬 ChatDB", "📊 Analytics"]
+    )
+
+    if page == "🏠 Introduction":
+        page1()  # Your existing Introduction page function
+    elif page == "💬 ChatDB":
+        page2()  # Updated ChatDB page
+    elif page == "📊 Analytics":
+        page3()  # Your existing Analytics page function
+
+# Run the app
+if __name__ == "__main__":
+    main()
