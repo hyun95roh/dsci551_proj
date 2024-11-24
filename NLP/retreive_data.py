@@ -35,52 +35,54 @@ def sql_retriever(response,print_out=None):
     else:
         return "You did not choose to print the actual data. Try again."
 
-def fire_retriever(response): 
-    target_node = [i for i in ['CDC','FRED','STOCK'] if i in response][0]   
-    base_url = 'https://dsci551-2f357-default-rtdb.firebaseio.com/'
-    target_filter = None if response.find('?')==-1 else response[response.find('?')+1:] 
-    print("---- target_node:",target_node)
-    print("---- target_filter:",target_filter)
+def fire_retriever(response, print_out=None): 
+    if print_out in ['y', 'yes', True]:
+        target_node = [i for i in ['CDC','FRED','STOCK'] if i in response][0]   
+        base_url = 'https://dsci551-2f357-default-rtdb.firebaseio.com/'
+        target_filter = None if response.find('?')==-1 else response[response.find('?')+1:] 
+        print("---- target_node:",target_node)
+        print("---- target_filter:",target_filter)
 
-    retriever = myfireDB() 
-    print("---- NOTE) We don't support DELETE and PUT to prevent data loss.") 
-    
-    user_input_curl = input("Hit 'get', 'show', 'print' to see the retrieved data")
-    user_input_curl = user_input_curl.lower() 
-    command_list = ['get', 'show', 'print']
+        retriever = myfireDB() 
+        print("---- NOTE) We don't support DELETE and PUT to prevent data loss.") 
+        
+        #user_input_curl = input("Hit 'get', 'show', 'print' to see the retrieved data")
+        user_input_curl = 'get' 
+        user_input_curl = user_input_curl.lower() 
+        command_list = ['get', 'show', 'print']
 
-    while user_input_curl not in command_list:  
-        print("Error. Available command: 'get', 'show','print' ")
-        user_input_curl = input("Hit 'get', 'show', 'print' to see the retrieved data")  
+        while user_input_curl not in command_list:  
+            print("Error. Available command: 'get', 'show','print' ")
+            user_input_curl = input("Hit 'get', 'show', 'print' to see the retrieved data")  
 
-    if user_input_curl in command_list:            
-        output = retriever.get(node= target_node, filter= target_filter)
-        print(output) 
-        return output 
+        if user_input_curl in command_list:            
+            output = retriever.get(node= target_node, filter= target_filter)
+            print(output) 
+            return output 
 
 
-    elif user_input_curl in ['POST','PATCH']: 
-        user_input1 = input("Choose one: FRED, STOCK, CDC") 
-        if user_input1 == 'FRED':
-            print('Input example: {"DATE":"01/31/2020", "Real Median Houshold Income in the US":99999} ')  
-        elif user_input1 == 'STOCK': 
-            print('Input example: {"DATE":"1987-03-31", "LLY": 10.99, "NVO": 5.4} ') 
-        else: 
-            print("""Input example: {"CLASSIFCATION": "Socioeconomic Characteristic" , "CLASSIFCATION_ID": 3,
-                  "ESTIMATE": 30.0, "ESTIMATE_TYPE": "Percent of population, age adjusted", ESTIMATED_TYPE_ID: 1,
-                  "GROUP":"Poverty level", "GROUP_ID":3 , "STANDARD_ERROR": 1.1, "SUBGROUP":"BELOW 100% FPL",
-                  "SUBGROUP_ID":9, "SUBTOPIC":"Normal weight (BMI from 18.5 to 24.9)", "SUBTOPIC_ID":1,
-                  "TIME_PERIOD":"1999-2002", "TIME_PERIOD": 2  
-                  }""")
+        elif user_input_curl in ['POST','PATCH']: 
+            user_input1 = input("Choose one: FRED, STOCK, CDC") 
+            if user_input1 == 'FRED':
+                print('Input example: {"DATE":"01/31/2020", "Real Median Houshold Income in the US":99999} ')  
+            elif user_input1 == 'STOCK': 
+                print('Input example: {"DATE":"1987-03-31", "LLY": 10.99, "NVO": 5.4} ') 
+            else: 
+                print("""Input example: {"CLASSIFCATION": "Socioeconomic Characteristic" , "CLASSIFCATION_ID": 3,
+                    "ESTIMATE": 30.0, "ESTIMATE_TYPE": "Percent of population, age adjusted", ESTIMATED_TYPE_ID: 1,
+                    "GROUP":"Poverty level", "GROUP_ID":3 , "STANDARD_ERROR": 1.1, "SUBGROUP":"BELOW 100% FPL",
+                    "SUBGROUP_ID":9, "SUBTOPIC":"Normal weight (BMI from 18.5 to 24.9)", "SUBTOPIC_ID":1,
+                    "TIME_PERIOD":"1999-2002", "TIME_PERIOD": 2  
+                    }""")
 
-        user_input2 = input("Input your data ") 
-        if user_input_curl == 'POST':
-            return retriever.post(node=user_input1, data=user_input2) 
-        if user_input_curl == 'PATCH':
-            return retriever.patch(node=user_input1, data=user_input2) 
+            user_input2 = input("Input your data ") 
+            if user_input_curl == 'POST':
+                return retriever.post(node=user_input1, data=user_input2) 
+            if user_input_curl == 'PATCH':
+                return retriever.patch(node=user_input1, data=user_input2) 
     
     else :
-        return
+        return "You did not choose printing the actual data. Try again."
 
 
 ''' 

@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import re 
 import time
 
 # Set page configuration
@@ -113,24 +114,26 @@ def page2():
     st.title("ChatDB: Chatbot Interface")
     st.write("Welcome to ChatDB! This is your Database query assistant. You can choose DB among MySQL and Firebase.")
 
-    # Initialize chat history and context in session state
-    if "messages" not in st.session_state:
-        st.session_state.messages = []  # Stores chat history
-    if "stage" not in st.session_state:
-        st.session_state.stage = "initial"  # Tracks the current stage of the interaction
-    if "user_input_nlq" not in st.session_state:
-        st.session_state.user_input_nlq = None  # Stores user's choice of NLQ option
-    if "user_input_db" not in st.session_state:
-        st.session_state.user_input_db = None  # Stores user's database choice
-    if "user_input_printout" not in st.session_state: 
-        st.session_state.user_input_printout =None #Stores user's retrieval print-out choice
-    if 'response' not in st.session_state:
-        st.session_state.response = None
-    if 'user_input' not in st.session_state:
-        st.session_state.user_input = None 
-    if 'retrieved_data' not in st.session_state: 
-        st.session_state.retrieved_data =None 
+    def session_initialization():
+        # Initialize chat history and context in session state
+        if "messages" not in st.session_state:
+            st.session_state.messages = []  # Stores chat history
+        if "stage" not in st.session_state:
+            st.session_state.stage = "initial"  # Tracks the current stage of the interaction
+        if "user_input_nlq" not in st.session_state:
+            st.session_state.user_input_nlq = None  # Stores user's choice of NLQ option
+        if "user_input_db" not in st.session_state:
+            st.session_state.user_input_db = None  # Stores user's database choice
+        if "user_input_printout" not in st.session_state: 
+            st.session_state.user_input_printout =None #Stores user's retrieval print-out choice
+        if 'response' not in st.session_state:
+            st.session_state.response = None
+        if 'user_input' not in st.session_state:
+            st.session_state.user_input = None 
+        if 'retrieved_data' not in st.session_state: 
+            st.session_state.retrieved_data =None 
 
+    session_initialization() 
 
     # Welcoming message from the assistant
     if st.session_state.stage == 'initial' and len(st.session_state.messages)==0:
@@ -158,7 +161,9 @@ def page2():
         # Process user's input based on the current stage
         #-- 1. initial stage
         if st.session_state.stage == "initial": 
-            if user_input not in ['1','database','db','2','examples','example','3','nlq']:
+            st.session_state.response = None 
+            st.session_state.retrieved_data = None 
+            if user_input not in ['1','database','db','2','examples','example','3','nlq','initial']:
                 st.session_state.response = "I didn't understand. Please choose an option: 1 (DB Exploration) 2 (See Example query), 3 (NLQ)."
             else: 
                 st.session_state.user_input_nlq = user_input
@@ -197,14 +202,14 @@ def page2():
             if user_input.lower() in ['y','yes','ok']:
                 st.session_state.user_input_printout = True
                 st.session_state.stage = "enter_query"
-                if st.session_state.user_input_db == 'mysql':
-                    st.session_state.response = "Please refer to available commands: example query {where|groupby|orderby|having|aggregation}."
-                else: 
-                    st.session_state.response = "Please refer to available command: example query {GET}." 
             else: 
                 st.session_state.user_input_printout = False 
-                st.session_state.stage = 'enter_query'
+
+            if st.session_state.user_input_db == 'mysql':
                 st.session_state.response = "Please refer to available commands: example query {where|groupby|orderby|having|aggregation}."
+            else: 
+                st.session_state.response = "Please refer to available command: example query {GET|orederBy|range}." 
+
 
         #-- 2.b2. Query request stage
         elif st.session_state.stage == 'enter_query' or 'example query' in user_input:
@@ -222,28 +227,53 @@ def page2():
 
         # Print out assisntant's response: 
         ## Streaming effect for assistant's response
-        assistant_response(st.session_state.response)
-        if st.session_state.retrieved_data is not None:
+        if st.session_state.stage is not 'closing':
+            assistant_response(st.session_state.response)
+        if st.session_state.retrieved_data is not None and st.session_state.stage is not 'closing':
             assistant_response(st.session_state.retrieved_data)
 
         #-- 3. Stand-by stage
-        if st.session_state.stage == "stand_by": 
-            st.session_state.response = "Anything else I can help you with? If you want to go back to the first stage to change your current stage, enter 'initial'. If you want to switch the database, hit 'switch'."
-            assistant_response(st.session_state.response)
-            st.session_state.stage == 'closing'
+        if st.session_state.stage == "stand_by":
+            st.session_state.response = None  
+            st.session_state.stage = 'closing' 
+            response = "Anything else I can help you with? If you want to go back to the first stage to change your current stage, enter 'initial'. If you want to switch the database, hit 'switch'. If you want to keep looking examples, 'example query {where|having|...etc}' or 'example query {GET|range|orderBy|...etc}' "
+            assistant_response(response)
+            
 
         #if user_input in ['initial','initialize','switch']: 
         #-- 4. Closing stage
         elif st.session_state.stage == "closing":
-            st.session_state.response = "Please wait a moment... all set! Hit Enter to proceed."
-            if st.session_state.user_input == 'initial':
-                st.session_state.stage = "initial"
-            elif st.session_state.user_input == 'switch':
-                st.session_state.stage = "choose_db"
+            pattern = r'\b(?:initial|switch|example)\b'
+            match = re.search(pattern, user_input, re.IGNORECASE)
+
+            if match:
+                response  = "Please wait a moment... all set! Hit Enter to proceed."
+                assistant_response(response)
+
+                if 'initial' in match.group():
+                    st.session_state.stage = "initial"
+                    # initialize session_state: 
+                    st.session_state.response = None 
+                    st.session_state.retrieved_data = None 
+                    response = "Hello! I'm ChatDB_39, your assistant. How can I help you today? Please choose an option: 1 (Database) 2 (Examples), 3 (NLQ)."
+                    assistant_response(response) 
+
+                elif 'switch' in match.group(): 
+                    st.session_state.stage = "choose_db"
+                    # initialize session_state:
+                    st.session_state.response = None 
+                    st.session_state.retrieved_data = None 
+                    st.session_state.user_input_db = None 
+                    st.session_state.user_input = None 
+
+                else: 
+                    st.session_state.stage = 'enter_query'
+    
             else: 
-                st.session_state.stage = 'enter_query'
-            assistant_response(st.session_state.response)
-            
+                st.session_state.stage = "stand_by"
+                response = "Unvalid query. Please refer to : { initial | switch | example query ~ }"
+                assistant_response(response) 
+                
 
 
 
@@ -260,6 +290,10 @@ def stream_effect(response):
         response_placeholder = st.empty()
         response_placeholder.markdown("No response to display.")
         return "", False
+
+    # Decode bytes to string if necessary
+    if isinstance(response, bytes):
+        response = response.decode("utf-8")  # Decode using UTF-8
 
     response_placeholder = st.empty()
     full_response = response  # Full response text

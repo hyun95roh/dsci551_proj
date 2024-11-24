@@ -308,13 +308,11 @@ def is_asking_fire_example(user_input) ->bool:
         response = "" 
         for keyword in keywords:
             if keyword == "GET":
-                response = template_get()
+                response = template_GET()
             elif keyword == "orderBy":
-                response = template_orderby() 
-            elif keyword in ["startAt", "endAt", "equalTo", "between"]:
+                response = template_orderBy() 
+            elif keyword in ["range","startAt", "endAt", "equalTo",'between']:
                 response = template_range() 
-            elif keyword == "limit" or keyword in ['limitToFirst','limitToLast']:  
-                response = template_limit()  
             else:
                 pass
 
@@ -329,26 +327,31 @@ def what_keyword_fire(user_input):
     selected_keywords = [] 
 
     curl_set = ['GET','POST','PATCH', 'get', 'post', 'patch'] 
-    filter_set = ['orderBy','startAt','endAt','equalTo', 'orderby', 'startat', 'endat', 'equalto'] 
+    filter_set = ['orderBy','startAt','endAt','equalTo', 'orderby', 'startat', 'endat', 'equalto', 'range', 'between'] 
 
     for i in curl_set: 
         if i in user_input :
             selected_keywords.append(i.upper()) # Uppercase-sensitive
 
     for i in filter_set: 
-        if i in user_input: 
-            q1 = i[-2:] 
-            q2 = q1[0].upper() + q1[1] 
-            j = i.replace(q1, q2)  
-            selected_keywords.append(j)
+        if i in user_input:
+            if i in ['range','between']: 
+                j = i 
+                selected_keywords.append(j) 
+
+            else: 
+                q1 = i[-2:] 
+                q2 = q1[0].upper() + q1[1] 
+                j = i.replace(q1, q2)  
+                selected_keywords.append(j)
 
     return selected_keywords 
 
-def template_get(): 
+def template_GET(): 
     sample_get = [
-        f'curl "{base_url}FRED.json"',
-        f'curl "{base_url}STOCK.json"',
-        f'curl "{base_url}CDC.json"'
+        f'curl \'{base_url}FRED.json\'', 
+        f'curl \'{base_url}STOCK.json?orderBy="$key"&print=pretty\'',
+        f'curl \'{base_url}CDC.json?orderBy="$key"&limitToFirst=3&print=pretty\''
     ]
 
     print("EXAMPLE QUERY:")
@@ -356,13 +359,27 @@ def template_get():
     print( output )
     return output
 
-def template_limit():
-    sample_limit = [
-        f'curl {base_url}/FRED.json?limitToFirst=5',
-        f'curl {base_url}/STOCK.json?limitToLast=1',
-        f'curl {base_url}/CDC.json?limitToFirst=5'
+def template_orderBy(): 
+    sample_get = [
+        f'curl "{base_url}FRED.json?orderBy=%22%24key%22&limitToFirst=10&print=pretty"',
+        f'curl "{base_url}STOCK.json?orderBy="LLY"&limitToFirst=10&print=pretty"',
+        f'curl "{base_url}CDC.json?orderBy="$key"&limitToFirst=3&print=pretty"'
+    ]
+
+    print("EXAMPLE QUERY:")
+    output = random.choice(sample_get)   
+    print( output )
+    return output
+
+def template_range():
+    sample_get = [
+        f'curl \'{base_url}FRED.json?orderBy="$key"&startAt="01_01_1998"&endAt="01_01_2018"&print=pretty\'',
+        f'curl \'{base_url}FRED.json?orderBy="$key"&equalTo="01_01_1998"&print=pretty\'',
+        f'curl \'{base_url}FRED.json?orderBy="Real_Median_Household_Income"&startAt=50000&endAt=60000&print=pretty\'',
+        f'curl \'{base_url}STOCK.json?orderBy="$key"&equalTo="1987-04-30"&print=pretty\'',
+        f'curl \'{base_url}STOCK.json?orderBy="LLY"&startAt=11&endAt=15&print=pretty\''
     ]
     print("EXAMPLE QUERY:")
-    output = random.choice(sample_limit)   
+    output = random.choice(sample_get)   
     print( output )
     return output

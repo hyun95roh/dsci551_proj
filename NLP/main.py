@@ -39,21 +39,21 @@ def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print
                 if print_out in ['y','yes',True]: # Print out the actual data
                     return response, sql_retriever(response, print_out)
                 
-                return response # Skip print out the actual data  
+                return response, None # Skip print out the actual data  
             else:
-                return "Your input does not match an example SQL query. Please refer to available commands: example query {where|groupby|orderby|having|aggregation}."
+                return "Your input does not match an example SQL query. Please refer to available commands: example query {where|groupby|orderby|having|aggregation}.", None 
         
         elif user_input_DB in ['2', 'firebase']:
             boolean, response = is_asking_fire_example(user_query)
             if boolean:
                 if print_out in ['y','yes',True]: 
                     return response, fire_retriever(response, print_out)
-                return response 
+                return response, None  
             else:
-                return "Your input does not match an example Firebase query. Please refer to available commands: example query GET."
+                return "Your input does not match an example Firebase query. Please refer to available commands: example query GET.", None
         
         else:
-            return "Invalid database choice. Please choose either MySQL or Firebase."
+            return "Invalid database choice. Please choose either MySQL or Firebase.", None 
 
 
 #    if user_input_nlq in ['3', 'nlq']:
