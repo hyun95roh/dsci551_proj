@@ -71,11 +71,11 @@ def page1():
     st.write("An Interactive Data Exploration Tool for Obesity Rates, Income, and Pharmaceutical Stock Sales.")
     st.write("Explore insights and correlations between health, economics, and industry trends using this tool.")
 
-    # File paths
-    bmi_data_path = "/Users/clarason/Downloads/CleanCDC_2.csv"
-    income_data_path = "/Users/clarason/Downloads/FRED.csv"
-    stock_data_path = "/Users/clarason/Downloads/stock.csv"
-
+    # File paths 
+    bmi_data_path = "./data/CleanCDC_2.csv"
+    income_data_path = "./data/FRED.csv"
+    stock_data_path = "./data/stock.csv"
+    
     # Load datasets
     try:
         bmi_data = pd.read_csv(bmi_data_path)
