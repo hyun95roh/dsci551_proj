@@ -237,12 +237,15 @@ def page2():
                 st.session_state.user_input_printout = False 
 
             if st.session_state.user_input_db == 'mysql':
-                response = "Please refer to available commands: example query {where|groupby|orderby|having|aggregation}."
+                response = "Please refer to available commands: "
+                assistant_response(response)
+                response = """(Explore DB) explore {CDC | FRED | STOCK} {attribute}' \n(View example query) example query {where|groupby|orderby|having|aggregation}. """
                 assistant_response(response)
             else: 
-                response = "Please refer to available command: example query {GET|orederBy|range}." 
+                response = "Please refer to available command: " 
                 assistant_response(response)
-
+                response = """(Explore DB) explore {CDC | FRED | STOCK}' \n(View example query) example query {where|groupby|orderby|having|aggregation}. """
+                assistant_response(response)
 
         #-- 2.b2. Query request stage
 
@@ -278,7 +281,7 @@ def page2():
         #if user_input in ['initial','initialize','switch']: 
         #-- 4. Closing stage
         elif st.session_state.stage == "closing" or match_initial_quiery:
-            match = pattern_match('initial|switch|example|display|show|list|identify|retrieve|tell|select|get', user_input) 
+            match = pattern_match('initial|switch|example|explore|display|show|list|identify|retrieve|tell|select|get', user_input) 
             #match2 = pattern_match('|display|show|list|identify|retrieve|tell|select|get',user_input) 
             if match : 
                 response  = "Please wait a moment... all set! Hit Enter to proceed."
@@ -339,6 +342,14 @@ def stream_effect(response):
     # Convert tuple to a string if needed
     if isinstance(response, tuple):
         response = "\n".join([str(item) for item in response])
+
+    # Convert list or tuple to a string if needed
+    if isinstance(response, (list, tuple)):
+        # Handle lists of rows (e.g., SQL query results)
+        if isinstance(response[0], (list, tuple)):  # List of rows
+            response = "\n".join(["  ".join(map(str, row)) for row in response])
+        else:  # Flat list or tuple
+            response = "\n".join(map(str, response))
 
     response_placeholder = st.empty()
     full_response = response  # Full response text

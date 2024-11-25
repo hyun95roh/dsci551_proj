@@ -136,6 +136,9 @@ def explore_fire_ds(user_input, which_dataset):
             bytes_data = explore.get(node= which_dataset)
             json_str = bytes_data.decode('utf-8')
             data = json.loads(json_str)
+
+            if type(data) is dict: 
+                data = dict_2_list_convert(data,5)
             
             # Get first record to examine its structure
             first_record = data[0]  # First item in the list
@@ -153,10 +156,16 @@ def explore_fire_ds(user_input, which_dataset):
             # Convert bytes to string and parse JSON
             json_str = bytes_data.decode('utf-8')
             data = json.loads(json_str)
+            if type(data) is dict: 
+                data = dict_2_list_convert(data, 5) 
             # Now data is a list, get first 10
+
+
             return data[:5]
 
     except Exception as e:
         print(f"Error accessing CDC database: {e}")
         return None
     
+def dict_2_list_convert(dictionary, top_n_rows): 
+    return [{k:v} for idx,(k,v) in enumerate(dictionary.items()) if idx<top_n_rows] 
