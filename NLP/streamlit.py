@@ -381,7 +381,40 @@ def pattern_match(pattern, user_input):
 # Page 3: Data Analysis
 def page3():
     st.title("Data Analysis")
-    st.write("Welcome to Page 3! This is the content for Page 3.")
+    st.write("Welcome to the Data Analysis page! Here, you can explore insights and visualize the relationships between BMI, income, and pharmaceutical stock data.")
+
+    # Obesity vs Pharmaceutical Stocks Correlational Analysis 
+    st.subheader("Obesity vs Pharmaceutical Stocks")
+    st.write("Below is a series of correlational analyses comparing different obesity levels with pharmaceutical stock data.")
+
+    # Display images in a 2x2 grid 
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image("./images/normal_vs_stocks.png", caption="Normal vs. Stock Data")
+        st.image("./images/obesity_2_vs_stocks.png", caption="Obesity Level 2 vs. Stock Data")
+    with col2:
+        st.image("./images/obesity_1_vs_stocks.png", caption="Obesity Level 1 vs. Stock Data")
+        st.image("./images/obesity_3_vs_stocks.png", caption="Obesity Level 3 vs. Stock Data")
+
+    st.markdown("""
+    * Positive Correlation with Obesity: 
+     \n Both NVO and LLY show increasing stock values as obesity levels rise, with stronger correlations for higher obesity categories (e.g., Obesity_3). NVO consistently exhibits a stronger correlation compared to LLY, indicating its stock performance is more closely tied to obesity-related trends.
+    * Negative Correlation with Normal Weight: 
+     \n Both companies' stock values decrease as the proportion of individuals in the normal weight range increases, with NVO showing a stronger negative correlation than LLY.
+    """)
+
+    # Additional Correlation Analysis Image
+    st.subheader("Obesity vs Median Income")
+    st.write("Below is a correlational analyses comparing different obesity levels with median household income.")
+    st.image("./images/fred_all_correlation_final.png")
+    st.markdown("""
+
+    * Normal (r = -0.7359): 
+    \n A strong negative correlation indicates that as income increases, the proportion of normal-weight individuals decreases.
+    
+    * Obesity_1 to Obesity_3 (r = 0.6875 to 0.7192): 
+    \n Positive correlations suggest that higher incomes are associated with greater proportions of individuals in higher obesity categories, with the strongest correlation in Obesity_2.
+    """)
 
 # Main Function: Navigation
 def main():

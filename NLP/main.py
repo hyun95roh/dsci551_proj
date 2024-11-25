@@ -5,6 +5,8 @@ from dataexplore_query import is_asking_sql_exploration, is_asking_fire_explorat
 from mysql import mysqlDB  
 from firebase import myfireDB 
 from retreive_data import sql_retriever, fire_retriever
+from NLQ_implementation.nlq_to_fbquery import NLQtoFBConverter
+from NLQ_implementation.nlq_to_sql import NLQtoSQLConverter
 
 # handle_user_input is a gateway function between Streamlit and Demo(for db exploration, example query, data retrieval)
 def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print_out=None):
@@ -72,15 +74,17 @@ def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print
         else:
             return "Invalid database choice. Please choose either MySQL or Firebase.", None 
 
-    ###############################################################################
-    # GATE 3 : Free NLQ handling  #################################################
+        # GATE 3 : Free NLQ handling  #################################################
     if user_input_nlq in ['3', 'nlq']:
         if not user_input_DB:
             return "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"
         
         if user_input_DB in ['1', 'sql', 'mysql']:
             boolean = True 
-            response = user_query #user_query means 'specific' query example or request.
+            #example query = "Show top 5 income values from FRED"
+            sql_converter = NLQtoSQLConverter()
+            response = sql_converter.convert_nlq_to_sql(user_query) #user_query means 'specific' query example or request.
+            
             if boolean: 
                 if print_out in ['y','yes',True]: # Print out the actual data
                     return response, sql_retriever(response, print_out)
@@ -91,7 +95,11 @@ def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print
         
         elif user_input_DB in ['2', 'firebase']:
             boolean = True 
-            response = user_query
+            #example query = "Show last 10 income values from FRED start from 2024-01-01 end to 2024-02-03"
+
+            fb_converter = NLQtoFBConverter()
+            response = fb_converter.output_query(user_query) #user_query means 'specific' query example or request.
+            
             response = "curl 'https://dsci551-2f357-default-rtdb.firebaseio.com/FRED.json'"
             if boolean:
                 if print_out in ['y','yes',True]: 
