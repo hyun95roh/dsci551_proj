@@ -1,11 +1,12 @@
 from attribute_matcher import match_attributes
 from attribute_sets import attribute_sets
 from example_query import is_asking_sql_example, is_asking_fire_example 
+from dataexplore_query import is_asking_sql_exploration, is_asking_fire_exploration
 from mysql import mysqlDB  
 from firebase import myfireDB 
 from retreive_data import sql_retriever, fire_retriever
 
-
+# handle_user_input is a gateway function between Streamlit and Demo(for db exploration, example query, data retrieval)
 def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print_out=None):
     """
     Handles the user input based on their intent.
@@ -18,23 +19,39 @@ def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print
     Returns:
         str: The response to be displayed or processed further.
     """
-    user_input_nlq = user_first_nlq.lower()
+    user_input_nlq = user_first_nlq.lower() #-- NLQ at the first stage(initial)
 
-#    if user_input_nlq in ['1', 'db', 'database']:
-#        if not user_input_DB:
-#            return "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"
-#        if not user_query:
-#            return "Enter your query (or type 'quit' to exit):"
-#        else:
-#            return "Invalid database choice. Please choose either MySQL or Firebase."
+    ###############################################################################
+    # GATE 1 : DB Exploration #####################################################
+    if user_input_nlq in ['1', 'db', 'database']:
+        if not user_input_DB:
+            return "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"
 
+        if user_input_DB in ['1', 'sql', 'mysql'] :
+            boolean, response = is_asking_sql_exploration(user_query)
+            if boolean: 
+                if print_out in ['y','yes',True]: 
+                    return "Here is a snapshot of your interest:", response 
+                return response, None 
+            else: 
+                return "Please refer to available commands: {}", None  
+        elif user_input_DB in ['2','firebase'] : 
+            boolean, response = is_asking_fire_exploration(user_query) 
+            if boolean: 
+                if print_out in ['y','yes',True]: #print out the exploration result 
+                   return "Here is a snapshot of your interest:", response 
+                return response, None # Skip print out the actual data 
+        else:
+            return "Invalid database choice. Please choose either MySQL or Firebase.", None 
 
+    ###############################################################################
+    # GATE 2 : Example queries ####################################################
     if user_input_nlq in ['2', 'examples', 'example']:
         if not user_input_DB:
             return "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"
         
         if user_input_DB in ['1', 'sql', 'mysql']:
-            boolean, response = is_asking_sql_example(user_query)
+            boolean, response = is_asking_sql_example(user_query) #user_query means 'specific' query example or request.
             if boolean: 
                 if print_out in ['y','yes',True]: # Print out the actual data
                     return response, sql_retriever(response, print_out)
@@ -55,7 +72,8 @@ def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print
         else:
             return "Invalid database choice. Please choose either MySQL or Firebase.", None 
 
-
+    ###############################################################################
+    # GATE 3 : Free NLQ handling  #################################################
 #    if user_input_nlq in ['3', 'nlq']:
 #        if not user_input_DB:
 #            return "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"

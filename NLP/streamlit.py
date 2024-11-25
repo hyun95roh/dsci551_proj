@@ -106,7 +106,7 @@ def page1():
     """, unsafe_allow_html=True)
 
 
-from main import handle_user_input
+from main import handle_user_input  # handle_user_input is a gateway function between Streamlit and Demo(for db exploration, example query, data retrieval)
 
 #----------------------------------------------------------------------------------------------
 # Streamlit interaction
@@ -159,44 +159,68 @@ def page2():
         with st.chat_message("user"):
             st.markdown(user_input)
 
+        # Matches
+        match_enter_query = pattern_match('example query|explore|describe', user_input) # direct path to go to stage=='enter_query'
+        match_initial_quiery = pattern_match('initial|initialize|redo', user_input) # direct path to go to stage=='initial' 
+        match_sql = pattern_match(pattern='1|sql|mysql', user_input= user_input)
+        match_fire = pattern_match(pattern='2|fire|firebase', user_input= user_input) 
+        match_explore = pattern_match(pattern='1|database|db|db exploration|explore db',user_input=user_input)
+        match_retrieve = pattern_match(pattern='2|examples|example|see example|see example query',user_input=user_input)
+
         # Process user's input based on the current stage
         #-- 1. initial stage
-        if st.session_state.stage == "initial": 
+        if st.session_state.stage == "initial" or match_initial_quiery: 
+            if st.session_state.user_input in ['initial','initialize','redo']: 
+                response = "Please choose an option: 1 (Database) 2 (Examples), 3 (NLQ)." 
+                assistant_response(response) 
+
             st.session_state.response = None 
             st.session_state.retrieved_data = None 
-            if user_input not in ['1','database','db','2','examples','example','3','nlq','initial']:
+            if user_input not in ['1','database','db','2','examples','example','3','nlq','initial','initialize','redo']:
                 st.session_state.response = "I didn't understand. Please choose an option: 1 (DB Exploration) 2 (See Example query), 3 (NLQ)."
             else: 
                 st.session_state.user_input_nlq = user_input
                 st.session_state.stage = "choose_db"
-                st.session_state.response = "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"                
+                response = "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"     
+                assistant_response(response)           
         
         #-- 2.a1. DB selection stage
         elif st.session_state.stage == "choose_db":
-            if user_input.lower() in ["1", "sql", "mysql"]:
+            if match_sql : 
                 st.session_state.user_input_db = "mysql"
-                if st.session_state.user_input_nlq in ['1','database','db','db exploration','explore db']:
-                    st.session_state.stage = 'explore_db'
-                    st.session_state.response = "You've selected MySQL. First, let me show you the overview of table. Tell me which table or attribute information do you want to see?"
 
-                if st.session_state.user_input_nlq in ['2','examples','example','see example','see example query']:
-                    st.session_state.stage = "choose_retrieve_option"
-                    st.session_state.response = "Would you like to retrieve the actual data from DB and print them out?"
-
-            elif user_input.lower() in ["2", "firebase", "fire"]:
+            elif match_fire :
                 st.session_state.user_input_db = "firebase"
+
+            if match_explore:
+                st.session_state.stage = 'explore_db'
+                response = "You've selected MySQL. Do you want to check the overview about databse?"
+                assistant_response(response)
+
+            elif match_retrieve:
                 st.session_state.stage = "choose_retrieve_option"
-                st.session_state.response = "Would you like to retrieve the actual data from DB and print them out?"
+                response = "Would you like to retrieve the actual data from DB and print them out?"
+                assistant_response(response)
+
             else:
-                st.session_state.response = "Invalid database choice. Please choose either MySQL (1) or Firebase (2)."
+                response = "Invalid database choice. Please choose either MySQL (1) or Firebase (2)."
+                assistant_response(response)
+
 
         #-- 2.a2. DB exploration stage 
         elif st.session_state.stage == 'explore_db': 
-            user_input_nlq = st.session_state.user_input_nlq
-            user_input_db = st.session_state.user_input_db
-            user_input_printout = st.session_state.user_input_printout 
-            st.session_state.response = handle_user_input(user_input_nlq, user_input_DB=user_input_db, user_query=user_input, print_out=user_input_printout)
-            st.session_state.stage = "initial"  # Reset the stage after processing the query            
+            if user_input in ['y','yes','ok','okay'] :
+                response = 'First, let me explain what table you can look in our SQL. Currently we have three datasets: CDC, FRED, and STOCK.'
+                assistant_response(response)
+
+                response = """ - CDC: 14 Attributes and 288 records.\n- FRED: 2 Attributes and 40 records.\n- STOCK: 3 Attributes and 454 records.\n(MySQL) To see the further information, hit 'explore {CDC | FRED | STOCK} attribute'\n(Firebase) To see the further information, hit 'explore {CDC | FRED | STOCK}'
+                        """
+                assistant_response(response)
+
+                response = f"Alright! Please look up the command examples above. Tell me which table or attribute information do you want to see. Your current DB is {st.session_state.user_input_db}."
+                assistant_response(response)
+
+            st.session_state.stage = "enter_query"  # Reset the stage after processing the query            
 
         #-- 2.b1. Retrieval option setting stage
         elif st.session_state.stage == 'choose_retrieve_option':
@@ -207,13 +231,17 @@ def page2():
                 st.session_state.user_input_printout = False 
 
             if st.session_state.user_input_db == 'mysql':
-                st.session_state.response = "Please refer to available commands: example query {where|groupby|orderby|having|aggregation}."
+                response = "Please refer to available commands: example query {where|groupby|orderby|having|aggregation}."
+                assistant_response(response)
             else: 
-                st.session_state.response = "Please refer to available command: example query {GET|orederBy|range}." 
+                response = "Please refer to available command: example query {GET|orederBy|range}." 
+                assistant_response(response)
 
 
         #-- 2.b2. Query request stage
-        elif st.session_state.stage == 'enter_query' or 'example query' in user_input:
+        
+
+        elif st.session_state.stage == 'enter_query' or match_enter_query: 
             user_input_nlq = st.session_state.user_input_nlq
             user_input_db = st.session_state.user_input_db
             user_input_printout = st.session_state.user_input_printout 
@@ -225,13 +253,14 @@ def page2():
                 )
             st.session_state.stage = 'stand_by'
 
-
+        ############################################################################
         # Print out assisntant's response: 
         ## Streaming effect for assistant's response
-        if st.session_state.stage is not 'closing':
+        if st.session_state.stage is not 'closing' and st.session_state.response is not None:
             assistant_response(st.session_state.response)
         if st.session_state.retrieved_data is not None and st.session_state.stage is not 'closing':
             assistant_response(st.session_state.retrieved_data)
+        ############################################################################
 
         #-- 3. Stand-by stage
         if st.session_state.stage == "stand_by":
@@ -243,16 +272,15 @@ def page2():
 
         #if user_input in ['initial','initialize','switch']: 
         #-- 4. Closing stage
-        elif st.session_state.stage == "closing":
-            pattern = r'\b(?:initial|switch|example)\b'
-            match = re.search(pattern, user_input, re.IGNORECASE)
-
+        elif st.session_state.stage == "closing" or match_initial_quiery:
+            match = pattern_match('initial|switch|example', user_input)
             if match:
                 response  = "Please wait a moment... all set! Hit Enter to proceed."
                 assistant_response(response)
 
                 if 'initial' in match.group():
                     st.session_state.stage = "initial"
+                    st.session_state.user_input = "initial" 
                     # initialize session_state: 
                     st.session_state.response = None 
                     st.session_state.retrieved_data = None 
@@ -260,12 +288,16 @@ def page2():
                     assistant_response(response) 
 
                 elif 'switch' in match.group(): 
-                    st.session_state.stage = "choose_db"
+                    st.session_state.stage = "enter_query"
                     # initialize session_state:
                     st.session_state.response = None 
                     st.session_state.retrieved_data = None 
-                    st.session_state.user_input_db = None 
+                    st.session_state.user_input_db = 'mysql' if st.session_state.user_input_db is 'firebase' else 'firebase' 
                     st.session_state.user_input = None 
+                    response = f"Your DB has been switched. Current DB: {st.session_state.user_input_db}"
+                    assistant_response(response) 
+                    response = "Know you can intput your specific query."
+                    assistant_response(response) 
 
                 else: 
                     st.session_state.stage = 'enter_query'
@@ -295,6 +327,10 @@ def stream_effect(response):
     # Decode bytes to string if necessary
     if isinstance(response, bytes):
         response = response.decode("utf-8")  # Decode using UTF-8
+
+    # Convert tuple to a string if needed
+    if isinstance(response, tuple):
+        response = "\n".join([str(item) for item in response])
 
     response_placeholder = st.empty()
     full_response = response  # Full response text
@@ -326,6 +362,12 @@ def append_response_to_chat(full_response, is_code=False):
         full_response = f"```\n{full_response}\n```"  # Wrap response in triple backticks
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
+
+def pattern_match(pattern, user_input):
+    # Add word boundaries around the pattern
+    bounded_pattern = fr'\b(?:{pattern})\b'
+    match = re.search(bounded_pattern, user_input, re.IGNORECASE)
+    return match 
 
 #------------------------------------------------------------------------------------------
 # Page 3: Data Analysis
