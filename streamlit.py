@@ -106,7 +106,7 @@ def page1():
     """, unsafe_allow_html=True)
 
 
-from NLP.main import handle_user_input  # handle_user_input is a gateway function between Streamlit and Demo(for db exploration, example query, data retrieval)
+from .NLP.main import handle_user_input  # handle_user_input is a gateway function between Streamlit and Demo(for db exploration, example query, data retrieval)
 
 #----------------------------------------------------------------------------------------------
 # Streamlit interaction
