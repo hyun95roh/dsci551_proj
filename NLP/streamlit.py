@@ -160,7 +160,7 @@ def page2():
             st.markdown(user_input)
 
         # Matches
-        match_enter_query = pattern_match('example query|explore|describe', user_input) # direct path to go to stage=='enter_query'
+        match_enter_query = pattern_match('example query|explore|describe|display|show|list|identify|retrieve|tell|select|get', user_input) # direct path to go to stage=='enter_query'
         match_initial_quiery = pattern_match('initial|initialize|redo', user_input) # direct path to go to stage=='initial' 
         match_nlq = pattern_match('nlq', user_input) # direct path to go to stage == 'choose_retrieve_option' for NLQ input 
         match_sql = pattern_match(pattern='1|sql|mysql', user_input= user_input)
@@ -278,8 +278,9 @@ def page2():
         #if user_input in ['initial','initialize','switch']: 
         #-- 4. Closing stage
         elif st.session_state.stage == "closing" or match_initial_quiery:
-            match = pattern_match('initial|switch|example', user_input)
-            if match:
+            match = pattern_match('initial|switch|example|display|show|list|identify|retrieve|tell|select|get', user_input) 
+            #match2 = pattern_match('|display|show|list|identify|retrieve|tell|select|get',user_input) 
+            if match : 
                 response  = "Please wait a moment... all set! Hit Enter to proceed."
                 assistant_response(response)
 
@@ -306,6 +307,8 @@ def page2():
 
                 else: 
                     st.session_state.stage = 'enter_query'
+                    #response = "Hit 'go' to proceed."
+                    #assistant_response(response)  
     
             else: 
                 st.session_state.stage = "stand_by"
