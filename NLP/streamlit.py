@@ -170,19 +170,18 @@ def page2():
         # Process user's input based on the current stage
         #-- 1. initial stage
         if st.session_state.stage == "initial" or match_initial_quiery: 
-            if st.session_state.user_input in ['initial','initialize','redo']: 
-                response = "Please choose an option: 1 (Database) 2 (Examples), 3 (NLQ)." 
-                assistant_response(response) 
-
             st.session_state.response = None 
             st.session_state.retrieved_data = None 
             if user_input not in ['1','database','db','2','examples','example','3','nlq','initial','initialize','redo']:
                 st.session_state.response = "I didn't understand. Please choose an option: 1 (DB Exploration) 2 (See Example query), 3 (NLQ)."
             else: 
                 st.session_state.user_input_nlq = user_input
-                st.session_state.stage = "choose_db"
-                response = "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"     
-                assistant_response(response)           
+                if match_initial_quiery:
+                    st.session_state.stage = 'closing'
+                else:
+                    st.session_state.stage = "choose_db"
+                    response = "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"     
+                    assistant_response(response)           
         
         #-- 2.a1. DB selection stage
         elif st.session_state.stage == "choose_db":
@@ -193,7 +192,7 @@ def page2():
                 st.session_state.user_input_db = "firebase"
 
             if match_explore:
-                st.session_state.stage = 'explore_db'
+                st.session_state.stage = 'choose_retrieve_option'
                 response = "You've selected MySQL. Do you want to check the overview about databse?"
                 assistant_response(response)
 
@@ -239,7 +238,6 @@ def page2():
 
 
         #-- 2.b2. Query request stage
-        
 
         elif st.session_state.stage == 'enter_query' or match_enter_query: 
             user_input_nlq = st.session_state.user_input_nlq
