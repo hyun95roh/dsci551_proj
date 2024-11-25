@@ -162,6 +162,7 @@ def page2():
         # Matches
         match_enter_query = pattern_match('example query|explore|describe', user_input) # direct path to go to stage=='enter_query'
         match_initial_quiery = pattern_match('initial|initialize|redo', user_input) # direct path to go to stage=='initial' 
+        match_nlq = pattern_match('nlq', user_input) # 
         match_sql = pattern_match(pattern='1|sql|mysql', user_input= user_input)
         match_fire = pattern_match(pattern='2|fire|firebase', user_input= user_input) 
         match_explore = pattern_match(pattern='1|database|db|db exploration|explore db',user_input=user_input)
@@ -178,6 +179,10 @@ def page2():
                 st.session_state.user_input_nlq = user_input
                 if match_initial_quiery:
                     st.session_state.stage = 'closing'
+
+                elif match_nlq: 
+                    st.session_state.stage = 'enter_query' 
+                
                 else:
                     st.session_state.stage = "choose_db"
                     response = "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"     
@@ -239,7 +244,7 @@ def page2():
 
         #-- 2.b2. Query request stage
 
-        elif st.session_state.stage == 'enter_query' or match_enter_query: 
+        elif st.session_state.stage == 'enter_query' or match_enter_query or match_nlq: 
             user_input_nlq = st.session_state.user_input_nlq
             user_input_db = st.session_state.user_input_db
             user_input_printout = st.session_state.user_input_printout 
