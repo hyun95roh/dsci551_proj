@@ -5,8 +5,7 @@ import time
 # Set page configuration
 st.set_page_config(page_title="551 Project", page_icon="📚")
 
-
-#Page 1
+# Page 1: Introduction
 def page1():
     # Add global styling for the entire website
     st.markdown("""
@@ -70,10 +69,10 @@ def page1():
     st.write("An Interactive Data Exploration Tool for Obesity Rates, Income, and Pharmaceutical Stock Sales.")
     st.write("Explore insights and correlations between health, economics, and industry trends using this tool.")
 
-    # File paths
-    bmi_data_path = "/Users/clarason/Downloads/CleanCDC_2.csv"
-    income_data_path = "/Users/clarason/Downloads/FRED.csv"
-    stock_data_path = "/Users/clarason/Downloads/stock.csv"
+    # File paths 
+    bmi_data_path = "./data/CleanCDC_2.csv"
+    income_data_path = "./data/FRED.csv"
+    stock_data_path = "./data/stock.csv"
 
     # Load datasets
     try:
@@ -105,6 +104,7 @@ def page1():
     """, unsafe_allow_html=True)
 
 
+# Page 2: ChatDB
 def page2():
     st.title("ChatDB: Chatbot Interface")
     st.write("Welcome to ChatDB! This is your chatbot interface.")
@@ -151,12 +151,6 @@ def page2():
         st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 
-
-
-
-
-
-
 # Page 3: Data Analysis
 def page3():
     st.title("Data Analysis")
@@ -164,28 +158,35 @@ def page3():
 
     # Obesity vs Pharmaceutical Stocks Correlational Analysis 
     st.subheader("Obesity vs Pharmaceutical Stocks")
-    st.write("Below is a series of analyses comparing different obesity levels with pharmaceutical stock data.")
+    st.write("Below is a series of correlational analyses comparing different obesity levels with pharmaceutical stock data.")
 
-    # Display images in a 2x2 grid
+    # Display images in a 2x2 grid 
     col1, col2 = st.columns(2)
     with col1:
-        st.image("/Users/clarason/Downloads/normal_vs_stocks.png", caption="Normal vs. Stock Data")
-        st.image("/Users/clarason/Downloads/obesity_2_vs_stocks.png", caption="Obesity Level 2 vs. Stock Data")
+        st.image("./images/normal_vs_stocks.png", caption="Normal vs. Stock Data")
+        st.image("./images/obesity_2_vs_stocks.png", caption="Obesity Level 2 vs. Stock Data")
     with col2:
-        st.image("/Users/clarason/Downloads/obesity_1_vs_stocks.png", caption="Obesity Level 1 vs. Stock Data")
-        st.image("/Users/clarason/Downloads/obesity_3_vs_stocks.png", caption="Obesity Level 3 vs. Stock Data")
+        st.image("./images/obesity_1_vs_stocks.png", caption="Obesity Level 1 vs. Stock Data")
+        st.image("./images/obesity_3_vs_stocks.png", caption="Obesity Level 3 vs. Stock Data")
 
     st.markdown("""
-    **Interpretation:**
-    Fixxx
+    * Positive Correlation with Obesity: 
+     \n Both NVO and LLY show increasing stock values as obesity levels rise, with stronger correlations for higher obesity categories (e.g., Obesity_3). NVO consistently exhibits a stronger correlation compared to LLY, indicating its stock performance is more closely tied to obesity-related trends.
+    * Negative Correlation with Normal Weight: 
+     \n Both companies' stock values decrease as the proportion of individuals in the normal weight range increases, with NVO showing a stronger negative correlation than LLY.
     """)
 
     # Additional Correlation Analysis Image
     st.subheader("Obesity vs Median Income")
-    st.image("/Users/clarason/Downloads/fred_all_correlation_final.png")
+    st.write("Below is a correlational analyses comparing different obesity levels with median household income.")
+    st.image("./images/fred_all_correlation_final.png")
     st.markdown("""
-    **Interpretation:**
-    Fixxx
+
+    * Normal (r = -0.7359): 
+    \n A strong negative correlation indicates that as income increases, the proportion of normal-weight individuals decreases.
+    
+    * Obesity_1 to Obesity_3 (r = 0.6875 to 0.7192): 
+    \n Positive correlations suggest that higher incomes are associated with greater proportions of individuals in higher obesity categories, with the strongest correlation in Obesity_2.
     """)
 
 
@@ -198,11 +199,11 @@ def main():
     )
 
     if page == "🏠 Introduction":
-        page1()  # Your existing Introduction page function
+        page1()
     elif page == "💬 ChatDB":
-        page2()  # Updated ChatDB page
+        page2()
     elif page == "📊 Analytics":
-        page3()  # Your existing Analytics page function
+        page3()
 
 # Run the app
 if __name__ == "__main__":
