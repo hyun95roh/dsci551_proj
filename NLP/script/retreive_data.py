@@ -1,5 +1,5 @@
-from mysql import mysqlDB  
-from firebase import myfireDB
+from .mysql import mysqlDB  
+from .firebase import myfireDB
 import json
 import pandas as pd  
 

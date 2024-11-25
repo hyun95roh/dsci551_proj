@@ -20,8 +20,8 @@ explore db firebase fred         # View FRED table data from Firebase
 """
 
 from pprint import pprint
-from mysql import mysqlDB
-from firebase import myfireDB
+from .mysql import mysqlDB
+from .firebase import myfireDB
 import json
 import re 
 

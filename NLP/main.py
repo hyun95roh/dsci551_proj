@@ -1,12 +1,8 @@
-from attribute_matcher import match_attributes
-from attribute_sets import attribute_sets
-from example_query import is_asking_sql_example, is_asking_fire_example 
-from dataexplore_query import is_asking_sql_exploration, is_asking_fire_exploration
-from mysql import mysqlDB  
-from firebase import myfireDB 
-from retreive_data import sql_retriever, fire_retriever
-from NLQ_implementation.nlq_to_fbquery import NLQtoFBConverter
-from NLQ_implementation.nlq_to_sql import NLQtoSQLConverter
+from .script.example_query import is_asking_sql_example, is_asking_fire_example 
+from .script.dataexplore_query import is_asking_sql_exploration, is_asking_fire_exploration
+from .script.retreive_data import sql_retriever, fire_retriever
+from .NLQ_implementation.nlq_to_fbquery import NLQtoFBConverter
+from .NLQ_implementation.nlq_to_sql import NLQtoSQLConverter
 
 # handle_user_input is a gateway function between Streamlit and Demo(for db exploration, example query, data retrieval)
 def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print_out=None):
