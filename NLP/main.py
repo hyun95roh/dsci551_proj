@@ -74,15 +74,34 @@ def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print
 
     ###############################################################################
     # GATE 3 : Free NLQ handling  #################################################
-#    if user_input_nlq in ['3', 'nlq']:
-#        if not user_input_DB:
-#            return "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"
-#        if not user_query:
-#            return "Enter your query (or type 'quit' to exit):"
-#        else:
-#            return "Invalid database choice. Please choose either MySQL or Firebase."
-
-    return "Invalid input. Please choose one of the available options: 1 (examples), 2 (database), or 3 (NLQ)."
+    if user_input_nlq in ['3', 'nlq']:
+        if not user_input_DB:
+            return "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"
+        
+        if user_input_DB in ['1', 'sql', 'mysql']:
+            boolean = True 
+            response = user_query #user_query means 'specific' query example or request.
+            if boolean: 
+                if print_out in ['y','yes',True]: # Print out the actual data
+                    return response, sql_retriever(response, print_out)
+                
+                return response, None # Skip print out the actual data  
+            else:
+                return "Your input does not match an example SQL query. Please refer to available commands: example query {where|groupby|orderby|having|aggregation}.", None 
+        
+        elif user_input_DB in ['2', 'firebase']:
+            boolean = True 
+            response = user_query
+            response = "curl 'https://dsci551-2f357-default-rtdb.firebaseio.com/FRED.json'"
+            if boolean:
+                if print_out in ['y','yes',True]: 
+                    return response, fire_retriever(response, print_out)
+                return response, None  
+            else:
+                return "Your input does not match an example Firebase query. Please refer to available commands: example query GET.", None
+        
+        else:
+            return "Invalid database choice. Please choose either MySQL or Firebase.", None 
 
 
 def main():

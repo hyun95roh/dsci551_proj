@@ -162,7 +162,7 @@ def page2():
         # Matches
         match_enter_query = pattern_match('example query|explore|describe', user_input) # direct path to go to stage=='enter_query'
         match_initial_quiery = pattern_match('initial|initialize|redo', user_input) # direct path to go to stage=='initial' 
-        match_nlq = pattern_match('nlq', user_input) # 
+        match_nlq = pattern_match('nlq', user_input) # direct path to go to stage == 'choose_retrieve_option' for NLQ input 
         match_sql = pattern_match(pattern='1|sql|mysql', user_input= user_input)
         match_fire = pattern_match(pattern='2|fire|firebase', user_input= user_input) 
         match_explore = pattern_match(pattern='1|database|db|db exploration|explore db',user_input=user_input)
@@ -180,8 +180,10 @@ def page2():
                 if match_initial_quiery:
                     st.session_state.stage = 'closing'
 
-                elif match_nlq: 
-                    st.session_state.stage = 'enter_query' 
+#                elif match_nlq: 
+#                    st.session_state.stage = 'choose_retrieve_option' 
+#                    response= "Jump to the choose_retrieve_option stage"
+#                    assistant_response(response)
                 
                 else:
                     st.session_state.stage = "choose_db"
@@ -227,7 +229,7 @@ def page2():
             st.session_state.stage = "enter_query"  # Reset the stage after processing the query            
 
         #-- 2.b1. Retrieval option setting stage
-        elif st.session_state.stage == 'choose_retrieve_option':
+        elif st.session_state.stage == 'choose_retrieve_option' :
             if user_input.lower() in ['y','yes','ok']:
                 st.session_state.user_input_printout = True
                 st.session_state.stage = "enter_query"
@@ -244,7 +246,7 @@ def page2():
 
         #-- 2.b2. Query request stage
 
-        elif st.session_state.stage == 'enter_query' or match_enter_query or match_nlq: 
+        elif st.session_state.stage == 'enter_query' or match_enter_query: 
             user_input_nlq = st.session_state.user_input_nlq
             user_input_db = st.session_state.user_input_db
             user_input_printout = st.session_state.user_input_printout 
