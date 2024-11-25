@@ -1,7 +1,7 @@
 from attribute_matcher import match_attributes
 from attribute_sets import attribute_sets
 from example_query import is_asking_for_example
-from dataexplore_query import is_asking_for_exploration
+from dsci551_proj.NLP.dataexplore_query import is_asking_for_exploration
 # from database.firebase import myfireDB
 # from database.mysql import mysqlDB
 
