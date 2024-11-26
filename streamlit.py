@@ -218,7 +218,8 @@ def page2():
             if match_explore or match_sql or match_fire:
                 st.session_state.stage = 'choose_retrieve_option'
                 response = f"You've selected {st.session_state.user_input_db}. I'll show you available command formats. Please hit 'go' or 'yes' to proceed."
-                
+                if st.session_state.gateway == 'db_exploration': #####
+                    st.session_state.stage = 'explore_db'
 
             elif match_retrieve or match_sql or match_fire:
                 st.session_state.stage = "choose_retrieve_option"
@@ -234,14 +235,14 @@ def page2():
         #-- 2.a2. DB exploration stage 
         elif st.session_state.stage == 'explore_db': 
             if user_input in ['y','yes','ok','okay'] :
-                response = 'First, let me explain what table you can look in our SQL. Currently we have three datasets: CDC, FRED, and STOCK.'
+                response = 'First, let me explain what table you can look in our database. Currently we have three datasets: CDC, FRED, and STOCK.'
                 assistant_response(response)
 
                 response = """ - CDC: 14 Attributes and 288 records.\n- FRED: 2 Attributes and 40 records.\n- STOCK: 3 Attributes and 454 records.\n(MySQL) To see the further information, hit 'explore {CDC | FRED | STOCK} attribute'\n(Firebase) To see the further information, hit 'explore {CDC | FRED | STOCK}'
                         """
                 assistant_response(response)
 
-                response = f"Alright! Please look up the command examples above. Tell me which table or attribute information do you want to see. Your current DB is {st.session_state.user_input_db}."
+                response = f"Alright! Please look up the command examples above. Tell me which table or attribute information do you want to see. Your current DB is <{st.session_state.user_input_db}>."
                 assistant_response(response)
 
             st.session_state.stage = "enter_query"  # Reset the stage after processing the query            
@@ -281,9 +282,9 @@ def page2():
         ############################################################################
         # Print out assisntant's response: 
         ## Streaming effect for assistant's response
-        if st.session_state.stage is not 'closing' and st.session_state.response is not None:
+        if st.session_state.stage != 'closing' and st.session_state.response != None:
             assistant_response(st.session_state.response)
-        if st.session_state.retrieved_data is not None and st.session_state.stage is not 'closing':
+        if st.session_state.retrieved_data != None and st.session_state.stage != 'closing':
             assistant_response(st.session_state.retrieved_data)
         ############################################################################
 
