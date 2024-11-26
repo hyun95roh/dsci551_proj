@@ -132,6 +132,9 @@ def page2():
             st.session_state.user_input = None 
         if 'retrieved_data' not in st.session_state: 
             st.session_state.retrieved_data =None 
+        if 'gateway' not in st.session_state: 
+            st.session_state.gateway =None 
+
 
     session_initialization() 
 
@@ -160,6 +163,7 @@ def page2():
             st.markdown(user_input)
 
         # Matches
+        match_gate = pattern_match('1|database|db|2|example|3|nlq|initial|initialize|redo', user_input)
         match_enter_query = pattern_match('example query|explore|describe|display|show|list|identify|retrieve|tell|select|get', user_input) # direct path to go to stage=='enter_query'
         match_initial_quiery = pattern_match('initial|initialize|redo', user_input) # direct path to go to stage=='initial' 
         match_nlq = pattern_match('nlq', user_input) # direct path to go to stage == 'choose_retrieve_option' for NLQ input 
@@ -173,10 +177,15 @@ def page2():
         if st.session_state.stage == "initial" or match_initial_quiery: 
             st.session_state.response = None 
             st.session_state.retrieved_data = None 
-            if user_input not in ['1','database','db','2','examples','example','3','nlq','initial','initialize','redo']:
-                st.session_state.response = "I didn't understand. Please choose an option: 1 (DB Exploration) 2 (See Example query), 3 (NLQ)."
-            else: 
+            if match_gate or match_explore or match_retrieve or match_nlq:  
                 st.session_state.user_input_nlq = user_input
+                if match_explore:
+                    st.session_state.gateway = 'db_exploration'
+                elif match_retrieve: 
+                    st.session_state.gateway = 'example_query'
+                else: 
+                    st.session_state.gateway = 'nlq'
+                
                 if match_initial_quiery:
                     st.session_state.stage = 'closing'
 
@@ -189,7 +198,11 @@ def page2():
                     st.session_state.stage = "choose_db"
                     response = "Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase"     
                     assistant_response(response)           
-        
+
+            else :
+                st.session_state.response = "I didn't understand. Please choose an option: 1 (DB Exploration) 2 (See Example query), 3 (NLQ)."
+
+
         #-- 2.a1. DB selection stage
         elif st.session_state.stage == "choose_db":
             if match_sql : 
@@ -198,19 +211,24 @@ def page2():
             elif match_fire :
                 st.session_state.user_input_db = "firebase"
 
-            if match_explore:
-                st.session_state.stage = 'choose_retrieve_option'
-                response = "You've selected MySQL. Do you want to check the overview about databse?"
-                assistant_response(response)
+            else:
+                response = "Invalid database choice. Please choose either MySQL (1) or Firebase (2)."
+                
 
-            elif match_retrieve:
+            if match_explore or match_sql or match_fire:
+                st.session_state.stage = 'choose_retrieve_option'
+                response = f"You've selected {st.session_state.user_input_db}. I'll show you available command formats. Please hit 'go' or 'yes' to proceed."
+                
+
+            elif match_retrieve or match_sql or match_fire:
                 st.session_state.stage = "choose_retrieve_option"
-                response = "Would you like to retrieve the actual data from DB and print them out?"
-                assistant_response(response)
+                response = "Let me retrieve the actual data for you... Done!  I'll show you available command formats. Please hit 'go' or 'yes' to proceed."
+                
 
             else:
                 response = "Invalid database choice. Please choose either MySQL (1) or Firebase (2)."
-                assistant_response(response)
+            
+            assistant_response(response)
 
 
         #-- 2.a2. DB exploration stage 
@@ -230,13 +248,13 @@ def page2():
 
         #-- 2.b1. Retrieval option setting stage
         elif st.session_state.stage == 'choose_retrieve_option' :
-            if user_input.lower() in ['y','yes','ok']:
+            if user_input.lower() in ['y','yes','ok','go']:
                 st.session_state.user_input_printout = True
                 st.session_state.stage = "enter_query"
             else: 
                 st.session_state.user_input_printout = False 
 
-            if st.session_state.user_input_db == 'mysql':
+            if st.session_state.user_input_db == 'mysql' :
                 response = "Please refer to available commands: "
                 assistant_response(response)
                 response = """(Explore DB) explore {CDC | FRED | STOCK} {attribute}' \n(View example query) example query {where|groupby|orderby|having|aggregation}. """
@@ -248,7 +266,6 @@ def page2():
                 assistant_response(response)
 
         #-- 2.b2. Query request stage
-
         elif st.session_state.stage == 'enter_query' or match_enter_query: 
             user_input_nlq = st.session_state.user_input_nlq
             user_input_db = st.session_state.user_input_db
