@@ -281,7 +281,7 @@ def page2():
         #if user_input in ['initial','initialize','switch']: 
         #-- 4. Closing stage
         elif st.session_state.stage == "closing" or match_initial_quiery:
-            match = pattern_match('initial|switch|example|explore|display|show|list|identify|retrieve|tell|select|get', user_input) 
+            match = pattern_match('initial|switch|example|explore|display|find|show|calculate|list|identify|retrieve|tell|select|get', user_input) 
             #match2 = pattern_match('|display|show|list|identify|retrieve|tell|select|get',user_input) 
             if match : 
                 response  = "Please wait a moment... all set! Hit Enter to proceed."

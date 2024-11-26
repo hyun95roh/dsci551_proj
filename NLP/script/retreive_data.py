@@ -16,12 +16,12 @@ def sql_retriever(response,print_out=None):
         try:
             # Extract result column names from the executed query
             column_names_query = f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{response.split('FROM')[1].split()[0].strip()}'"
-            table_columns = [col[0] for col in retriever.execute(column_names_query)]
+            table_columns = [col[0] for col in retriever.execute(column_names_query)] 
 
             # Infer column names from the query structure if possible
             if "AVG(" in response or "SUM(" in response or "COUNT(" in response or "MAX(" in response or "MIN(" in response:
                 # For aggregation queries, manually define result column names
-                column_names = [col.strip() for col in response.split("SELECT")[1].split("FROM")[0].split(",")]
+                column_names = [col.strip() for col in response.split("SELECT")[1].split("FROM")[0].split(",")] 
             else:
                 column_names = table_columns  # Default to all table columns
         except IndexError:
