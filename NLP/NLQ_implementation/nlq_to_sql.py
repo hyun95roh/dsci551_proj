@@ -12,9 +12,9 @@ class nlq_parser:
         self.nlq = sample_nlq 
         self.full_table_list = ['FRED', 'CDC', 'STOCK']  
         self.full_att_list = {
-            'FRED': ['date','income'], 
-            'STOCK': ['DATE','NOV','LLY'],
-            'CDC': ['SUBTOPIC', 'SUBTOPIC_ID', 'CLASSIFICATION', 'CLASSIFICATION_ID', 
+            'FRED': ['*','date','income'], 
+            'STOCK': ['*','DATE','NOV','LLY'],
+            'CDC': ['*','SUBTOPIC', 'SUBTOPIC_ID', 'CLASSIFICATION', 'CLASSIFICATION_ID', 
                    'GROUP_NAME', 'GROUP_ID', 'SUBGROUP', 'SUBGROUP_ID', 'ESTIMATE_TYPE', 
                    'ESTIMATE_TYPE_ID', 'TIME_PERIOD', 'TIME_PERIOD_ID', 'ESTIMATE', 
                    'STANDARD_ERROR']
@@ -22,7 +22,7 @@ class nlq_parser:
         
         self.nlq_start_token = ["find", "group", "show", "retrieve", "calculate", 
                                "identify", "count", "list", "display", "tell"]
-        self.nlq_agg_token = ['sum', 'total', 'average', 'mean', 'max', 'min']
+        self.nlq_agg_token = ['sum', 'avg', 'max', 'min', 'count']
         self.nlq_tokens = None
 
     def check_atts(self, sample_nlq): 
@@ -54,7 +54,7 @@ class nlq_parser:
 
     def check_select(self, sample_nlq):
         cnt = 0
-        pattern = r'\b(?:find|display|show|list|identify|retrieve|tell|Calculate)\b'
+        pattern = r'\b(?:find|display|show|list|identify|retrieve|tell|Calculate|select)\b'
         atts_position = self.check_atts(sample_nlq)
         match = re.search(pattern, sample_nlq, re.IGNORECASE)
         if match:    
@@ -128,7 +128,7 @@ class NLQtoSQLConverter:
             'where': ['where'],
             'group by': ['group by', 'grouped by'],
             'order by': ['ordered by', 'sorted by'],
-            'limit': ['top', 'highest', 'lowest', 'only']
+            'limit': ['top', 'highest', 'lowest', 'only','limit']
         }
         self.query_parts = {}
 
@@ -211,6 +211,9 @@ class NLQtoSQLConverter:
             'equal': '=',
             'is': '=',
             'greater than': '>',
+            '>': '>',
+            '<': '<',
+            '=': '=',
             'bigger than': '>',
             'more than': '>',
             'larger than': '>',
@@ -317,7 +320,7 @@ class NLQtoSQLConverter:
         return None
 
     def extract_limit_clause(self, nlq):
-        pattern = r'\b(?:top|highest|lowest|only)\b (\d+)' #only allows digits
+        pattern = r'\b(?:top|highest|lowest|only|limit)\b (\d+)' #only allows digits
         match = re.search(pattern, nlq, re.IGNORECASE)
         if match:
             limit_output = match.group(1).strip()

@@ -96,7 +96,7 @@ def handle_user_input(user_first_nlq, user_input_DB=None, user_query=None, print
             fb_converter = NLQtoFBConverter()
             response = fb_converter.output_query(user_query) #user_query means 'specific' query example or request.
             
-            response = "curl 'https://dsci551-2f357-default-rtdb.firebaseio.com/FRED.json'"
+            #response = "curl 'https://dsci551-2f357-default-rtdb.firebaseio.com/FRED.json'"
             if boolean:
                 if print_out in ['y','yes',True]: 
                     return response, fire_retriever(response, print_out)

@@ -11,8 +11,8 @@ class fb_nlq_parser:
         self.nlq = sample_nlq 
         self.full_table_list = ['FRED', 'CDC', 'STOCK']  
         self.full_att_list = {
-            'FRED': ['date','income'], 
-            'STOCK': ['DATE','NOV','LLY'],
+            'FRED': ['$key','income','Real_Median_Household_Income'], 
+            'STOCK': ['$key','NOV','LLY'],
             'CDC': ['SUBTOPIC', 'SUBTOPIC_ID', 'CLASSIFICATION', 'CLASSIFICATION_ID', 
                    'GROUP_NAME', 'GROUP_ID', 'SUBGROUP', 'SUBGROUP_ID', 'ESTIMATE_TYPE', 
                    'ESTIMATE_TYPE_ID', 'TIME_PERIOD', 'TIME_PERIOD_ID', 'ESTIMATE', 
@@ -185,10 +185,10 @@ class fb_nlq_parser:
                 start_value = value_match.group(0)  # Using group(0) to get entire match
                 
                 if start_value.isdigit():
-                    result = f'startAt={start_value}'
+                    result = f'endAt={start_value}'
                 else:
                     start_value = start_value.replace('/', '-')  # Standardize separator
-                    result = f'startAt="{start_value}"'
+                    result = f'endAt="{start_value}"'
                 return result
             
             else:
@@ -256,6 +256,9 @@ class NLQtoFBConverter():
 
         dataset = self.fb_nlq_parer.check_from(user_input)
         order_by = self.fb_nlq_parer.check_orderBy(user_input)
+
+        if order_by == 'income': 
+            order_by = 'Real_Median_Houshold_Income'
 
         fb_query = f'curl "{self.base_url}{dataset}.json?orderBy={order_by}'
 
