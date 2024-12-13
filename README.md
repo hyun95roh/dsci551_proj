@@ -151,4 +151,4 @@ Providing a unbreakable database query should take various information into cons
 |---|---|
 |Hyuntae Roh|hroh@usc.edu|
 |Jing Chuang|cchuang8@usc.edu|
-|Hayong Son|hayoungs@usc.edu|
+|HaYoung Son|hayoungs@usc.edu|
