@@ -1,9 +1,44 @@
 # DSCI 551 proj
 DSCI_551 Database Management - CHATDB_39
 
+## File Structure 
+<details> 
+
+#### 0) Root 
+0.1) NLP folder - a folder containing core modules.
+
+0.2) data folder - a folder storing raw data set.
+    
+0.3) images folder - a folder having images for readme and streamlit app.
+    
+0.4) readme 
+    
+0.5) environment.yml 
+    
+0.6) streamlit.py - the module for building streamlit app.
+
+#### 1. NLP 
+1.1) Deprecated - outdated files are sleeping in here.
+
+1.2) NLQ_implmentation - Two python file for handling natural language query to database query:  ***nlq_to_fbquery.py*** and ***nlq_to_sql.py*** 
+
+1.3) Script -
+ -  ***mysql.py*** and ***firebase.py*** are modules for interacting with each database. Based on these two module, ***retrieve_data.py*** provides retriever that outputs table-like retrieval result for each database query. If your query has correct syntax, you are even allowed to add or delete tables in MySQL. In Firebase, we disabled DELETE to avoid accidental loss of data, while you can still add new data by using POST or PATCH. 
+ -  ***example_query.py*** and ***dataexplore_query.py*** supports browsing database query examples and database itself. Please refer to ***How to use CHATDB*** in readme for further details.    
+
+1.4) main.py - this module aggregates scripts under the NLP folder and provide gateway function named 'handle_user_input', which handles input from users and call the specific functions corresponding to the user demand.
+
+#### 2) data - folder to store raw data(csv files)
+
+#### 3) images - images for readme and streamlit are stored
+
+
+</details>
+
+----
+
 ## Archietecture 
 <details>
-<summary> Click here to expand/collapse </summary>
 
 ![architecture_01](./images/architecture_01.png)
 
@@ -35,7 +70,7 @@ Here is a snapshot that shows the flow of navigational questions from our ChatDB
 |Q2. Which DB do you want? Input the number or name: 1. MySQL / 2.Firebase| Type one of: ***(my)sql, fire(base)*** | Type one of: ***(my)sql, fire(base)*** | Type one of: ***(my)sql, fire(base)*** |
 |Q3. Type available commands | Type one of the table/collection of interest: ***explore {CDC\|STOCK\|FRED}*** | Type specific query of interest: (SQL) ***example query {where \| groupby\| orderby\| having\|aggregation}*** (FIREBASE) ***example query {get \| orderby \| range}*** | Please refer to 'How to generate response from natural language' 
 
- |
+**( Note )** You can always go back to the first stage by typing ***initial***. 
 
 ---
 ## How to generate response from natural language
