@@ -7,7 +7,7 @@ class mysqlDB:
 
     def __init__(self):
         # Database connection parameters
-        self.host = '18.144.100.180'  # Replace with the IP address of the remote server
+        self.host = '54.153.69.166'  # Replace with the IP address of the remote server
         self.user = 'client'    # Replace with your MySQL username
         self.password = 'dsci551' # Replace with your MySQL password
         self.database = 'CHATDB_39' # Replace with the name of your database
